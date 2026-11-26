@@ -7,6 +7,14 @@
 
 No app code exists yet. Phase 1 starts only after Node 22 is installed and the user approves this plan. This file is a checklist: behaviour and contracts live in the docs above.
 
+> **Close-out status (2026-11-26):** Phases 0–5 verified and committed. Phase 6 committed as partial (home Lighthouse below target), then the home page passed on the live site in Phase 7. Phase 7 deployed and signed off. Live: https://noora-studio.pages.dev (storefront), https://noora-api.tridev-g811.workers.dev (API). The checklist below is the original plan. Where it conflicts with what shipped, these decisions win:
+> - Images stored in D1 blobs, not R2 (card-free). Full cap 500 KB (R8 lowered from 3 MB); thumb 300 KB.
+> - Pages Functions (`frontend/functions/`) proxy `/api`, `/images`, `/sitemap.xml`, `/robots.txt`; `_redirects` is SPA fallback only (R17 superseded).
+> - Admin upload is one multipart POST to `/api/admin/products/:id/images` (supersedes the `PUT /api/admin/uploads` step in 4.5).
+> - Worker `noora-api`, Pages `noora-studio`; deploys use `wrangler login --device --browser=false`, not `CLOUDFLARE_API_TOKEN`.
+> - Admin origin check added (403 on a foreign `Origin`).
+> - Route list and contracts: `endpoints.txt` and `.claude/schema.md`.
+
 ---
 
 Hard limits (paise, 10 ms Worker CPU, 150,000-byte bundle, Lighthouse ≥ 90) live in `CLAUDE.md` and architecture.md; this plan does not repeat them.

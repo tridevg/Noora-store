@@ -20,6 +20,8 @@ Mobile-first e-commerce and services site for a small beauty parlour and ladies'
 - `.claude/schema.md` — D1 DDL, migrations, `/api/*` Zod contracts
 - `.claude/manifest.json` — phase status, files, migrations, endpoints, env vars, test results
 - `.claude/scratchpad.md` — decisions, handoffs, blockers
+- `endpoints.txt` — API routes, auth, CSRF, caching, deploy commands
+- `docs/superpowers/plans/implementation-plan.md` — original plan; a close-out banner at the top lists where shipped decisions supersede it
 
 ## Non-Negotiable Rules
 - **Money:** INTEGER paise everywhere. Never floats.
@@ -33,6 +35,7 @@ Mobile-first e-commerce and services site for a small beauty parlour and ladies'
 - **Bookings:** out of v1 scope (schema only).
 
 ## Commands
+- Live smoke: `curl -s https://noora-studio.pages.dev/api/settings` and `curl -s https://noora-api.tridev-g811.workers.dev/api/health`
 - Install: `npm install` (root, workspaces)
 - Dev: `npx wrangler dev` (backend, 127.0.0.1:8787) and `npm run dev -w frontend` (Vite, 127.0.0.1:5173)
 - Test: `npm test` (Vitest + Miniflare)

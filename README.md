@@ -54,7 +54,7 @@ Then open `http://localhost:5173`.
 
 ```sh
 npm run typecheck   # tsc --noEmit in every workspace
-npm test            # Vitest in every workspace (passes with no tests until Phase 2)
+npm test            # Vitest in every workspace
 npm run lint        # ESLint (typescript-eslint recommended)
 npm run format:check
 ```

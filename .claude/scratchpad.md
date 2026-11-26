@@ -70,3 +70,12 @@ Open: R17 (_redirects proxy for Phase 7) not approved. Lighthouse needs a Chromi
 - Kept: apt browser support libs; origin allowlist; Pages Functions proxy; D1 WebP blobs.
 - User is rotating the admin password, deleting /home/ubuntu/admin.txt, and removing the unused ADMIN_PASSWORD_HASH secret.
 - No Phase 8 needed now.
+
+
+## Close-out (2026-11-26)
+- All phases 0–7 complete. Phase 8 not planned by the user.
+- Phase 6 partial at commit, home fixed on live in Phase 7.
+- Admin password rotation by the user. admin.txt deleted by the user. ADMIN_PASSWORD_HASH secret removed; SESSION_SECRET remains.
+- Apt browser-support libs kept. Playwright Chromium in user space.
+- Docs synced: CLAUDE.md, manifest.json, plan close-out banner, README, endpoints.txt, scratchpad.
+- Open for user: git remote (none); npm audit (6 high) triage; remove or keep apt libs (decided: keep).

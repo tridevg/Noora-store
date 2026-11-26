@@ -31,7 +31,7 @@
     "6": {
       "name": "Verification (tsc, Vitest, bundle, Lighthouse)",
       "status": "partial",
-      "note": "Lighthouse (user-space Playwright Chromium, mobile): home Perf 86 LCP 2.5s (target 90, <2.5s) FAIL; product Perf 94 LCP 2.4s PASS; A11y 100 and SEO 92 on both. Carried into Phase 7."
+      "note": "Committed partial (home Lighthouse 86, LCP 2.5 s). Home passed on the live site in Phase 7 (Perf 96, LCP 0.84 s)."
     },
     "7": {
       "name": "Noora card-free deployment (D1 images, Workers, Pages)",
@@ -68,7 +68,10 @@
     "README.md",
     "shared/",
     "backend/",
-    "frontend/"
+    "frontend/",
+    "endpoints.txt",
+    "README.md (deploy section updated)",
+    "docs/superpowers/plans/implementation-plan.md (close-out banner added)"
   ],
   "files_pending_architect": [],
   "migrations_applied": [
@@ -209,5 +212,15 @@
       "rotate admin password via /admin"
     ],
     "phase_8": "not needed now"
-  }
+  },
+  "docs_status": {
+    "CLAUDE.md": "synced 2026-11-26",
+    "architecture.md": "synced",
+    "schema.md": "synced (Phase 7 additions)",
+    "endpoints.txt": "added 2026-11-26",
+    "implementation-plan.md": "close-out banner added; checklist kept as original",
+    "scratchpad.md": "final entry added",
+    "README.md": "deploy section and test note updated"
+  },
+  "last_commit_docs": "pending"
 }
