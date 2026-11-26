@@ -210,3 +210,6 @@ Order status transitions (enforced server-side): `new` → `confirmed` | `cancel
 ### Purge rule (`caches.default`)
 
 On each mutation marked "yes" above, the backend deletes these exact keys (origin + path, no query): `/api/categories`, `/api/products`, `/api/services`, `/api/settings`, `/api/products/<slug>` for every affected product (old and new slug). Query-string variants of list endpoints are not enumerated; they expire on their own within `s-maxage=300`.
+
+## Additional route (Phase 3 audit)
+- `GET /api/health` — returns `{"ok": true}`. Not part of the public contract table; used for smoke checks only.

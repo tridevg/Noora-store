@@ -1,0 +1,17 @@
+name = "beauty-store-api"
+main = "src/index.ts"
+compatibility_date = "2025-09-01"
+compatibility_flags = ["nodejs_compat"]
+
+[dev]
+ip = "127.0.0.1"
+port = 8787
+
+[[d1_databases]]
+binding = "DB"
+database_name = "beauty-store"
+migrations_dir = "migrations"
+
+[[r2_buckets]]
+binding = "IMAGES"
+bucket_name = "beauty-store-images"
