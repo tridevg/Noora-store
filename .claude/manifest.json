@@ -35,7 +35,7 @@
     },
     "7": {
       "name": "Noora card-free deployment (D1 images, Workers, Pages)",
-      "status": "verified"
+      "status": "signed_off"
     }
   },
   "environment": {
@@ -189,7 +189,22 @@
     "d1_database_id": "96eebef2-a1ec-42a1-b049-476a3257dee6",
     "seeded_products": 12,
     "temporary_project_deleted": "noora (domain noora-2yi.pages.dev)",
-    "admin_password_status": "generated once in Phase 7; rotation pending (user)",
-    "admin_credentials_file": "/home/ubuntu/admin.txt (outside repo, mode 600)"
+    "admin_password_status": "rotation in progress by user",
+    "admin_credentials_file": "to be deleted by user"
+  },
+  "signoff": {
+    "phase_7": "signed off by user",
+    "kept": [
+      "apt browser support libraries (plymouth/udisks2 intact; Playwright Chromium preserved)",
+      "origin allowlist 403 on foreign Origin",
+      "Pages Functions proxy",
+      "D1 WebP blob storage"
+    ],
+    "user_actions_pending": [
+      "rotate admin password via /admin",
+      "delete /home/ubuntu/admin.txt",
+      "remove unused ADMIN_PASSWORD_HASH Worker secret"
+    ],
+    "phase_8": "not needed now"
   }
 }

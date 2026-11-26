@@ -64,3 +64,9 @@ Open: R17 (_redirects proxy for Phase 7) not approved. Lighthouse needs a Chromi
 - Lighthouse live: product Perf 92 / LCP 1.81 s; home Perf 96 / LCP 0.84 s.
 - Open: admin password rotation (was printed in transcript); remove unused ADMIN_PASSWORD_HASH secret or wire it up; apt browser libs left installed; npm audit 6 high; no git remote.
 - Report: /home/ubuntu/report.txt. Credentials: /home/ubuntu/admin.txt (outside repo).
+
+
+## Phase 7 signed off (user)
+- Kept: apt browser support libs; origin allowlist; Pages Functions proxy; D1 WebP blobs.
+- User is rotating the admin password, deleting /home/ubuntu/admin.txt, and removing the unused ADMIN_PASSWORD_HASH secret.
+- No Phase 8 needed now.
