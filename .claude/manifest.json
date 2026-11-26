@@ -50,7 +50,8 @@
     "ram": "3.7Gi",
     "disk_free": "45G",
     "chromium": null,
-    "blockers": []
+    "blockers": [],
+    "apt_browser_libs_installed": "libnss3, libgbm1, libatk*, libcups2t64, libasound2t64, libxss1 and deps, installed 2026-11-26 10:33 by verifier; kept (full purge would remove plymouth/udisks2)"
   },
   "files_created": [
     "docs/superpowers/specs/2026-11-26-beauty-store-v1-design.md",
@@ -147,12 +148,13 @@
     "150 KB gzip JS budget",
     "PBKDF2 100000 iterations",
     "login limit 5 per 15 min",
-    "image limits 3 MB full / 300 KB thumb",
+    "image limits full 500 KB / thumb 300 KB (Phase 7; full lowered from 3 MB)",
     "canonical-key cache purge; filtered variants expire at s-maxage=300",
-    "browser WebP fallback to image/jpeg q0.82 accepted; real Content-Type stored in R2",
+    "browser WebP fallback to image/jpeg q0.82 accepted; real Content-Type stored with the blob in D1 (R2 dropped in Phase 7)",
     "rate_limits(key, attempted_at) replaces login_attempts; POST /api/orders capped 5 per 15 min per IP (deviates from spec table name, approved)",
-    "Phase 7 uses default *.pages.dev, *.workers.dev, r2.dev or /images/* route; custom domain optional",
-    "Phase 6 Lighthouse: @puppeteer/browsers chrome@stable or Playwright Chromium; no snap"
+    "Phase 7: default subdomains; Pages Functions proxy /api, /images, /sitemap.xml, /robots.txt to the Worker; no R2, images in D1 blobs",
+    "Lighthouse via user-space Playwright Chromium (chromium.executablePath()); no snap or apt browser installs",
+    "Phase 7 deploy login: wrangler login --device --browser=false; no CLOUDFLARE_API_TOKEN required"
   ],
   "phase_approvals": {
     "0": "user approved",
@@ -172,6 +174,8 @@
     "d1_database": "noora-db",
     "d1_database_id": "96eebef2-a1ec-42a1-b049-476a3257dee6",
     "seeded_products": 12,
-    "temporary_project_deleted": "noora (domain noora-2yi.pages.dev)"
+    "temporary_project_deleted": "noora (domain noora-2yi.pages.dev)",
+    "admin_password_status": "generated once in Phase 7; rotation pending (user)",
+    "admin_credentials_file": "/home/ubuntu/admin.txt (outside repo, mode 600)"
   }
 }

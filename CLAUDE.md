@@ -7,9 +7,9 @@ Mobile-first e-commerce and services site for a small beauty parlour and ladies'
 - Node v22.23.5 and npm 10.9.9 installed.
 - Git: local only, no remote. Working branch is `dev`.
 
-## Workspace Layout (planned, not yet created)
+## Workspace Layout (created)
 - `/frontend` — React + Vite + TypeScript (strict), Tailwind, React Router → Cloudflare Pages
-- `/backend` — TypeScript + Hono on Cloudflare Workers (`/api/*`, `/images/*`); D1 migrations in `backend/migrations/`
+- `/backend` — TypeScript + Hono on Cloudflare Workers (`/api/*`, `/images/*`); D1 migrations in `backend/migrations/`; production Worker `noora-api`
 - `/shared` — Zod schemas, paise formatters, WhatsApp builders
 - `/README.md` — root readme
 - `docs/superpowers/specs/` — approved design spec
@@ -32,12 +32,14 @@ Mobile-first e-commerce and services site for a small beauty parlour and ladies'
 - **Rate limits:** D1 table `rate_limits(key, attempted_at)`. Keys `login:<ip_hash>` (5 failed logins per 15 min) and `order:<ip_hash>` (5 orders per 15 min). Blocked requests get `429` with `Retry-After: 900`.
 - **Bookings:** out of v1 scope (schema only).
 
-## Commands (to be finalized in Phase 1)
+## Commands
 - Install: `npm install` (root, workspaces)
 - Dev: `npx wrangler dev` (backend, 127.0.0.1:8787) and `npm run dev -w frontend` (Vite, 127.0.0.1:5173)
 - Test: `npm test` (Vitest + Miniflare)
 - Typecheck: `npx tsc --noEmit -p <workspace>`
-- Deploy: headless, using `CLOUDFLARE_API_TOKEN` (Phase 7 only); default `*.pages.dev` and `*.workers.dev` subdomains, no custom domain required
+- Deploy: `npx wrangler login --device --browser=false` once, then `npx wrangler deploy` (backend) and `npx wrangler pages deploy frontend/dist --project-name=noora-studio` (frontend). No `CLOUDFLARE_API_TOKEN` needed. Default `*.pages.dev` and `*.workers.dev` subdomains.
+- Browser audit: `npm run audit:lighthouse` (user-space Playwright Chromium via `chromium.executablePath()`; no apt browser installs)
+- Live URLs: storefront https://noora-studio.pages.dev; API https://noora-api.tridev-g811.workers.dev
 
 ## Phase Gate
 Each phase ends with: sync all five state files, summarize changes plus verification commands, and wait for explicit user approval before the next phase.

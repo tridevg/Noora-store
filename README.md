@@ -61,4 +61,11 @@ npm run format:check
 
 ## Deploy
 
-Deployment to Cloudflare (Pages for the SPA, Workers for the API) is Phase 7. See the plan for the steps. The default `*.pages.dev` and `*.workers.dev` subdomains are used; no custom domain is required. A custom domain is optional and can be bound later in the Cloudflare dashboard.
+Live deployment (Phase 7, done):
+
+- Storefront: https://noora-studio.pages.dev (Pages project `noora-studio`)
+- API: https://noora-api.tridev-g811.workers.dev (Worker `noora-api`, D1 `noora-db`)
+- Images are stored as WebP/JPEG blobs in D1 (no R2, so no card is needed).
+- Deploy: `npx wrangler login --device --browser=false`, then `npx wrangler deploy` in `backend/` and `npx wrangler pages deploy frontend/dist --project-name=noora-studio`.
+
+The default `*.pages.dev` and `*.workers.dev` subdomains are used. A custom domain is optional and can be bound later in the Cloudflare dashboard. Admin credentials are not in this repo. Rotate the admin password after first login.

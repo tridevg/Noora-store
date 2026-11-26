@@ -55,3 +55,12 @@ Open: R17 (_redirects proxy for Phase 7) not approved. Lighthouse needs a Chromi
 - Flag: money conversions in frontend (components/admin/money.ts, components/storefront/catalogQuery.ts) use rupees*100 and toFixed(2) for display. Integer-safe. Reviewed, not blocking.
 - Gaps carried to Phase 6 or later: placeholder static pages; stock not enforced at cart or checkout; WhatsApp message uses cart prices while the server total is authoritative; window.open after await can be pop-up blocked; admin image orphan cleanup and reorder/alt-text endpoints absent.
 - Next: Phase 6 requires user approval. Smoke-test readiness step still pending.
+
+
+## Phase 7 deployed and state synced (2026-11-26)
+- Worker noora-api (D1 noora-db) and Pages noora-studio are live. Temporary Pages project `noora` (noora-2yi.pages.dev) deleted.
+- Images are D1 blobs. R2 removed. Full cap 500 KB, thumb 300 KB.
+- Admin origin allowlist added (403 for unknown Origin, `csrf_failed`). Review pending.
+- Lighthouse live: product Perf 92 / LCP 1.81 s; home Perf 96 / LCP 0.84 s.
+- Open: admin password rotation (was printed in transcript); remove unused ADMIN_PASSWORD_HASH secret or wire it up; apt browser libs left installed; npm audit 6 high; no git remote.
+- Report: /home/ubuntu/report.txt. Credentials: /home/ubuntu/admin.txt (outside repo).

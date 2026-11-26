@@ -31,7 +31,7 @@ EC2: wrangler dev 127.0.0.1:8787   (workerd, local D1 state)
 
 Because the browser only ever talks to `localhost:5173`, there is no CORS. The Worker sees `request.url` as `http://127.0.0.1:8787/...`, so the `Secure` cookie flag stays off. That is the intended behaviour for this topology.
 
-Production (Phase 7) uses default subdomains only: the SPA at `https://<project>.pages.dev` and the Worker at `https://beauty-store-api.<subdomain>.workers.dev`. Pages `_redirects` proxies `/api/*` and `/images/*` to the Worker with `200` rewrites (R17). The browser therefore sees one origin, so `SameSite=Strict` cookies and the no-CORS rule still hold. The Worker sees `https://` URLs, so `Secure` is on. A custom domain is optional and noted in README.md only.
+Production (Phase 7) uses default subdomains only: the SPA at `https://noora-studio.pages.dev` and the Worker at `https://noora-api.tridev-g811.workers.dev`. Pages Functions (`frontend/functions/`) proxy `/api/*`, `/images/*`, `/sitemap.xml` and `/robots.txt` to the Worker. This replaces the earlier `_redirects` plan (R17). The browser therefore sees one origin, so `SameSite=Strict` cookies and the no-CORS rule still hold. The Worker sees `https://` URLs, so `Secure` is on. A custom domain is optional and noted in README.md only.
 
 ## 3. Request and edge-cache flow
 
@@ -70,11 +70,11 @@ Runs in `/admin/products/:id` only. Never in the Worker.
    - `full`: long edge at most 1600 px, `toBlob('image/webp', 0.82)`
    - `thumb`: long edge at most 400 px, `toBlob('image/webp', 0.75)`
 4. Format check. If `blob.type` is `image/webp`, keep it. If the browser falls back to another type (for example PNG), re-encode that variant with `toBlob('image/jpeg', 0.82)`. Accepted output is only `image/webp` or `image/jpeg`. No browser is rejected.
-5. Check output sizes: `full` ≤ 3 MB, `thumb` ≤ 300 KB (approved limits; the Worker enforces the same limits on the output).
+5. Check output sizes: `full` ≤ 500 KB, `thumb` ≤ 300 KB (Phase 7 limits; the Worker enforces the same limits on the output).
 6. `POST /api/admin/products/<productId>/images` as multipart (`full` and `thumb` parts). The Worker generates the keys, checks type and size (full ≤ 500 KB, thumb ≤ 300 KB), and writes both blobs and the link in one D1 batch. See `.claude/schema.md` Phase 7 additions.
-7. `POST /api/admin/products/:id/images` with `{ full_r2_key, thumb_r2_key, alt_text, sort_order }` links the rows.
+7. Step 6 is the only write. The earlier separate link call (`{ full_r2_key, thumb_r2_key, ... }`) is superseded: blobs and the link are written in one batch.
 
-Module: `frontend/src/lib/webp.ts` exports `toWebpVariants(file: File): Promise<{ full: Blob; thumb: Blob }>`. Each blob is `image/webp` or `image/jpeg`.
+Module: the image pipeline lives in `frontend/src/components/admin/imagePipeline.ts` (`lib/webp.ts` was not used). Each blob is `image/webp` or `image/jpeg`.
 
 ## 5. Admin authentication
 
