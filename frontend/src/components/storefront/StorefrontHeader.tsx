@@ -12,8 +12,8 @@ const SEARCH_DEBOUNCE_MS = 300;
 const NAV_LINKS = [
   { to: '/services', label: 'nav.salonServices' },
   { to: '/products', label: 'nav.catalogue' },
-  { to: '/category/skin', label: 'nav.skincare' },
-  { to: '/category/makeup', label: 'nav.makeup' },
+  { to: '/services', label: 'nav.skincare' },
+  { to: '/services', label: 'nav.makeup' },
   { to: '/about', label: 'nav.ourStory' },
 ] as const;
 
@@ -46,7 +46,7 @@ export function StorefrontHeader() {
         >
           {NAV_LINKS.map((link) => (
             <NavLink
-              key={link.to}
+              key={link.label}
               to={link.to}
               className={({ isActive }) =>
                 `rounded-pill px-3 py-2 font-ui text-small font-medium transition-colors hover:bg-sand ${

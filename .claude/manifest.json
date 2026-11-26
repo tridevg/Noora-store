@@ -189,6 +189,43 @@
         "lcp_note": "Before and after the LCP fix (eager, fetchpriority=high, async decode) the audit stays at 2.82-2.84 s. Breakdown: resource load delay ~0.7-0.8 s (image is not discoverable in the initial HTML; it renders after the product API response), so the API waterfall is the remaining lever."
       },
       "note": "Gates: npm test 27/120/47 (shared/backend/frontend). LCP follow-up 2026-11-26: nav /category/skincare changed to /category/skin; gallery image marked loading=eager; deployed production build index-B-X-fxzR (deployment b6918996). Gates: typecheck, lint, format:check, build all exit 0; check:bundle 118838 bytes gzip."
+    },
+    "edge_preload_2026-11-26": {
+      "changes": [
+        "frontend/functions/product/[slug].ts: Pages Function for /product/:slug; Link preload header and injected <link rel=preload> for the first gallery image (imagesrcset/imagesizes match ProductGallery)",
+        "StorefrontHeader: Skincare and Makeup links point to /services (was /category/skin and /category/makeup); nav key changed to label"
+      ],
+      "gates": {
+        "typecheck": 0,
+        "lint": 0,
+        "format_check": 0,
+        "npm_test": "shared 27, backend 120, frontend 47",
+        "build": 0,
+        "check_bundle_gzip_bytes": 118832,
+        "limit_bytes": 150000
+      },
+      "deployment": "https://c91b5826.noora-studio.pages.dev (production, build index-C__s9c-a); verified: /api/settings 200 application/json, /robots.txt 200 text/plain, /sitemap.xml 200 application/xml, /product/oxidised-jhumka-earrings 200 with Link preload and app root",
+      "lighthouse_mobile_3_runs": {
+        "product_oxidised-jhumka-earrings": {
+          "perf": [94, 93, 92],
+          "perf_median": 93,
+          "a11y": [100, 100, 100],
+          "seo": [100, 100, 100],
+          "lcp_ms": [2835, 2852, 2841],
+          "lcp_median_ms": 2841,
+          "cls": [0, 0, 0]
+        },
+        "home": {
+          "perf": [93, 95, 96],
+          "perf_median": 95,
+          "a11y": [100, 100, 100],
+          "seo": [100, 100, 100],
+          "lcp_ms": [889, 946, 863],
+          "lcp_median_ms": 889,
+          "cls": [0.038, 0.038, 0.038]
+        }
+      },
+      "result": "Preload works (image request starts ~0.5 s, before the JS bundle finishes) but product LCP is unchanged at 2.84 s. Target 1.8 s NOT met. Remaining cost: element render delay about 1.08 s, because the gallery <img> only renders after the JS bundle and GET /api/products/:slug complete. Next lever: deliver the product data with the HTML (Pages Function inlines it, ProductDetailPage consumes it), which needs a frontend/src data-flow change and user approval."
     }
   },
   "decisions": [
@@ -238,6 +275,8 @@
     "phase8_final_deployment": "https://3e75dd7b.noora-studio.pages.dev",
     "phase8_lcp_followup_deployment": "https://b6918996.noora-studio.pages.dev",
     "phase8_lcp_followup_build": "index-B-X-fxzR",
+    "phase8_edge_preload_deployment": "https://c91b5826.noora-studio.pages.dev",
+    "phase8_edge_preload_build": "index-C__s9c-a",
     "frontend_deploy_command": "cd frontend && npx wrangler pages deploy dist --project-name=noora-studio --branch=main"
   },
   "signoff": {
