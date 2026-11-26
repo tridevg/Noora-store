@@ -345,7 +345,8 @@
     "implementation-plan.md": "close-out banner and Phase 8 close-out section synced 2026-11-26; original checklist unchanged",
     "scratchpad.md": "Phase 8 entries and follow-ups present; setup.txt entry added",
     "README.md": "deploy section verified; setup.txt pointer added",
-    "setup.txt": "onboarding file added in 5e76f1e; paths and scripts verified 2026-11-26"
+    "setup.txt": "onboarding file added in 5e76f1e; paths and scripts verified 2026-11-26",
+    "HANDOFF_MACOS.md": "added 2026-11-26 (MacBook handoff: state, setup, checks, deploy, backlog, do-not list; sanitize results in scratchpad)"
   },
   "last_commit_docs": "5e76f1e",
   "session_state": {
@@ -359,6 +360,7 @@
       "f2df097"
     ],
     "open_items": [
+      "MacBook handoff: HANDOFF_MACOS.md added; owner moves to MacBook and pushes dev (git push -u origin dev). Review backend/seed/seed.sql line 22 (committed admin hash).",
       "Git push: user runs `! git push` (local dev is ahead of origin/dev).",
       "Makeup and Skincare nav both point to /services (no per-category anchors).",
       "Fallback font metrics tuned on Linux; need a real-phone check.",

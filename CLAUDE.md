@@ -23,6 +23,7 @@ Mobile-first e-commerce and services site for a small beauty parlour and ladies'
 - `.claude/scratchpad.md` — decisions, handoffs, blockers
 - `endpoints.txt` — API routes, auth, CSRF, caching, deploy commands
 - `setup.txt` — macOS setup, Cloudflare login and connectivity checks, local dev, deploy steps (onboarding; no secrets)
+- `HANDOFF_MACOS.md` — MacBook handoff: current state, live resources, setup, checks, deploy, owner backlog (no secrets)
 - `docs/superpowers/plans/implementation-plan.md` — original plan; a close-out banner at the top lists where shipped decisions supersede it
 
 ## Non-Negotiable Rules

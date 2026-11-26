@@ -150,3 +150,12 @@ Open: R17 (_redirects proxy for Phase 7) not approved. Lighthouse needs a Chromi
 - `setup.txt` added: macOS prerequisites (Node 22, npm), clone and `dev` branch, Cloudflare device login, connectivity checks (`wrangler whoami`, D1 and Pages lists, `/api/settings`, `/api/health`, `robots.txt`), local dev with `backend/.dev.vars`, tests, deploy from `backend/` and `frontend/` with `--branch=main`, and Lighthouse via user-space Playwright Chromium.
 - No secrets in the file. Admin password stays out of the repo. Commit identity note only.
 - Docs sync (2026-11-26): setup.txt paths and npm scripts checked against the repo; listed in CLAUDE.md Source-of-Truth and the README design-docs line.
+
+## 2026-11-26 — MacBook handoff prepared (HANDOFF_MACOS.md)
+- Owner is moving development to an Apple Silicon MacBook. The owner pushes `dev` (agent did not push or deploy).
+- Added `HANDOFF_MACOS.md` at the repo root: current state, live Cloudflare resources (names and ids only), MacBook setup, local dev, checks, deploy, smoke and audits, owner backlog, do-not list.
+- Sanitize results: git status clean at start; `.gitignore` covers `.dev.vars`, `.env*` (via `*.local`), `.wrangler/`, `node_modules/`, `dist/` (checked with `git check-ignore`). No `admin.txt`, `.dev.vars`, or `.env*` tracked or present in the tree. `/tmp/storefront-template` absent. `endpoints.txt` and `setup.txt` contain names, placeholders, and public URLs only.
+- Secret-pattern scan of tracked files: benign hits only (`test-only-session-secret` in `backend/vitest.config.ts` and `backend/test/admin/auth.test.ts`; `Password` UI label in `frontend/src/i18n/en.ts`; code and docs that name `ADMIN_PASSWORD_HASH` or PBKDF2 formats).
+- Flag for owner: `backend/seed/seed.sql` line 22 has a committed PBKDF2 hash for the `admin` user. Not changed (backend is out of scope for this handoff). Confirm the live password was rotated; decide on removing the hash from the seed file. It remains in git history.
+- Remote: `origin/dev` exists at 44df1b6; local `dev` is 8 commits ahead at the time of this entry.
+- Owner action before pushing: none beyond `git push -u origin dev` on the MacBook (GitHub credentials needed there).
