@@ -47,6 +47,13 @@ export default function HomePage() {
           <Notice tone="error" onRetry={categories.reload}>
             {errorMessage(categories.error)}
           </Notice>
+        ) : categories.loading ? (
+          // Same tile footprint as the loaded list, so the content below does not shift on load.
+          <ul aria-hidden="true" className="grid grid-cols-2 gap-3 md:grid-cols-4">
+            {Array.from({ length: 4 }, (_, index) => (
+              <li key={index} className="min-h-20 animate-pulse rounded-card bg-surface-raised" />
+            ))}
+          </ul>
         ) : (
           <ul className="grid grid-cols-2 gap-3 md:grid-cols-4">
             {productCategories.map((category) => (
@@ -78,6 +85,11 @@ export default function HomePage() {
           <Notice tone="error" onRetry={featured.reload}>
             {errorMessage(featured.error)}
           </Notice>
+        ) : featured.data && featured.data.items.length === 0 ? (
+          // Reserve the grid's height so an empty catalogue does not pull the footer up on load.
+          <p className="flex min-h-64 items-center justify-center rounded-card bg-surface-raised p-6 text-center text-muted shadow-card">
+            {t('storefront.home.noProducts')}
+          </p>
         ) : (
           <ProductGrid products={featured.data?.items ?? []} />
         )}

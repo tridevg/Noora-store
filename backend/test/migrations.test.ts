@@ -12,6 +12,7 @@ const TABLES = [
   'admin_users',
   'rate_limits',
   'bookings',
+  'product_image_blobs',
 ];
 
 const INDEXES = [
@@ -44,5 +45,21 @@ describe('migration 0001_init', () => {
     ).all<{ name: string }>();
     const names = new Set(results.map((r) => r.name));
     for (const index of INDEXES) expect(names.has(index), index).toBe(true);
+  });
+
+  it('migration 0002 creates the blob table and the Noora brand defaults', async () => {
+    const cols = await env.DB.prepare("PRAGMA table_info('product_image_blobs')").all<{
+      name: string;
+    }>();
+    expect(cols.results.map((c) => c.name).sort()).toEqual([
+      'content_type',
+      'created_at',
+      'data',
+      'key',
+    ]);
+    const brand = await env.DB.prepare(
+      "SELECT value FROM settings WHERE key = 'business_name'",
+    ).first<{ value: string }>();
+    expect(brand?.value).toBe('Noora');
   });
 });

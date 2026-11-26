@@ -9,18 +9,15 @@ import {
   ProductUpdateSchema,
   SettingsUpdateSchema,
   SlugSchema,
-  UploadKeySchema,
   VariantCreateSchema,
   OrderStatusUpdateSchema,
   OrderListQuerySchema,
   AdminProductListQuerySchema,
   ServiceCreateSchema,
   ServiceUpdateSchema,
-  ImageCreateSchema,
+  ImageUploadFieldsSchema,
   VariantUpdateSchema,
 } from '../src/index';
-
-const UUID = '0b6f3c1e-2d4a-4b7c-9e8f-123456789abc';
 
 const validOrder = {
   customer_name: 'Asha',
@@ -41,18 +38,6 @@ describe('SlugSchema', () => {
   it('rejects slugs that are not lowercase kebab-case', () => {
     expect(SlugSchema.safeParse('silk-saree-red').success).toBe(true);
     expect(SlugSchema.safeParse('Bad Slug').success).toBe(false);
-  });
-});
-
-describe('UploadKeySchema', () => {
-  it('accepts well-formed keys', () => {
-    expect(UploadKeySchema.safeParse(`products/12/${UUID}-full.webp`).success).toBe(true);
-    expect(UploadKeySchema.safeParse(`products/12/${UUID}-thumb.jpg`).success).toBe(true);
-  });
-
-  it('rejects traversal and wrong extensions', () => {
-    expect(UploadKeySchema.safeParse('../x.webp').success).toBe(false);
-    expect(UploadKeySchema.safeParse(`products/1/${UUID}-full.png`).success).toBe(false);
   });
 });
 
@@ -119,13 +104,9 @@ describe('variant and image schemas', () => {
     expect(VariantUpdateSchema.safeParse({ stock: 5 }).success).toBe(true);
   });
 
-  it('accepts image keys produced by uploads', () => {
-    expect(
-      ImageCreateSchema.safeParse({
-        full_r2_key: `products/12/${UUID}-full.webp`,
-        thumb_r2_key: `products/12/${UUID}-thumb.webp`,
-      }).success,
-    ).toBe(true);
+  it('defaults image link fields and rejects a negative sort_order', () => {
+    expect(ImageUploadFieldsSchema.parse({})).toEqual({ alt_text: '', sort_order: 0 });
+    expect(ImageUploadFieldsSchema.safeParse({ sort_order: -1 }).success).toBe(false);
   });
 });
 

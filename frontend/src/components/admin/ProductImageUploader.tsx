@@ -1,11 +1,11 @@
 import { useState } from 'react';
 import type { ImageDto } from '@beauty-store/shared';
 import { t } from '../../i18n';
-import { ApiError, apiDelete, apiPost } from '../../lib/api';
+import { ApiError, apiDelete } from '../../lib/api';
 import { describeError } from './adminErrors';
-import { AdminImageError, extensionFor, toWebpVariants } from './imagePipeline';
+import { AdminImageError, toWebpVariants } from './imagePipeline';
 import { Notice, dangerButtonClass, secondaryButtonClass } from './ui';
-import { uploadObject } from './uploadObject';
+import { uploadImagePair } from './uploadImage';
 
 interface Props {
   productId: number;
@@ -32,8 +32,9 @@ function imageErrorText(error: unknown): string {
 }
 
 /**
- * Compresses each chosen file in the browser, uploads full and thumb to R2, then links
- * the pair to the product. Files are processed one at a time to stay within memory limits.
+ * Compresses each chosen file in the browser, then uploads the full and thumb pair in one
+ * request. The server stores both and links them to the product in one D1 batch.
+ * Files are processed one at a time to stay within memory limits.
  */
 export function ProductImageUploader({ productId, images, onChanged }: Props) {
   const [busy, setBusy] = useState(false);
@@ -55,21 +56,9 @@ export function ProductImageUploader({ productId, images, onChanged }: Props) {
       try {
         setProgress({ done: index, total: list.length, fraction: 0 });
         const { full, thumb } = await toWebpVariants(file);
-        const uuid = crypto.randomUUID();
-        const fullKey = `products/${productId}/${uuid}-full.${extensionFor(fullMime(full))}`;
-        const thumbKey = `products/${productId}/${uuid}-thumb.${extensionFor(fullMime(thumb))}`;
-        await uploadObject(fullKey, full, (fraction) =>
-          setProgress({ done: index, total: list.length, fraction: fraction / 2 }),
+        await uploadImagePair(productId, full, thumb, { altText: '', sortOrder }, (fraction) =>
+          setProgress({ done: index, total: list.length, fraction }),
         );
-        await uploadObject(thumbKey, thumb, (fraction) =>
-          setProgress({ done: index, total: list.length, fraction: 0.5 + fraction / 2 }),
-        );
-        await apiPost(`/api/admin/products/${productId}/images`, {
-          full_r2_key: fullKey,
-          thumb_r2_key: thumbKey,
-          alt_text: '',
-          sort_order: sortOrder,
-        });
         sortOrder += 1;
       } catch (error) {
         failures += 1;
@@ -158,9 +147,4 @@ export function ProductImageUploader({ productId, images, onChanged }: Props) {
       </div>
     </div>
   );
-}
-
-/** The blob type is the decided output type; extensionFor needs it narrowed. */
-function fullMime(blob: Blob): 'image/webp' | 'image/jpeg' {
-  return blob.type === 'image/webp' ? 'image/webp' : 'image/jpeg';
 }

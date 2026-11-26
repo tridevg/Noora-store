@@ -1,4 +1,4 @@
-name = "beauty-store-api"
+name = "noora-api"
 main = "src/index.ts"
 compatibility_date = "2025-09-01"
 compatibility_flags = ["nodejs_compat"]
@@ -9,9 +9,9 @@ port = 8787
 
 [[d1_databases]]
 binding = "DB"
-database_name = "beauty-store"
+database_name = "noora-db"
+database_id = "96eebef2-a1ec-42a1-b049-476a3257dee6"
 migrations_dir = "migrations"
 
-[[r2_buckets]]
-binding = "IMAGES"
-bucket_name = "beauty-store-images"
+[vars]
+SITE_URL = "https://noora-studio.pages.dev"

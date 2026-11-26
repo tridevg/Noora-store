@@ -2,7 +2,7 @@
 // Adding Hindi later means adding hi.ts with the same shape (architecture.md section 7).
 export const en = {
   brand: {
-    name: 'Beauty Store',
+    name: 'Noora',
   },
   nav: {
     home: 'Home',
@@ -19,7 +19,7 @@ export const en = {
     searchPlaceholder: 'Search products',
     searchSubmit: 'Search',
     cartLabel: 'Open cart',
-    homeLabel: 'Beauty Store home',
+    homeLabel: 'Noora home',
   },
   whatsapp: {
     fabLabel: 'Chat with us on WhatsApp',
@@ -161,7 +161,7 @@ export const en = {
       imageRemoved: 'Image removed.',
       uploadTitle: 'Upload images',
       uploadHelp:
-        'JPEG or WebP. Images are compressed in your browser before upload (full ≤ 3 MB, thumbnail ≤ 300 KB).',
+        'JPEG or WebP. Images are compressed in your browser before upload (full ≤ 500 KB, thumbnail ≤ 300 KB).',
       uploadPick: 'Choose images',
       uploadProgress: 'Uploading {done} of {total}',
       imageLinked: 'Image added.',
@@ -243,10 +243,11 @@ export const en = {
   },
   storefront: {
     home: {
-      heroFallback: 'Beauty and fashion for every day',
+      heroFallback: "Noora — beauty parlour & ladies' fashion",
       shopNow: 'Shop now',
       categoriesHeading: 'Shop by category',
       featuredHeading: 'Featured products',
+      noProducts: 'No products are listed yet. Check back soon.',
       servicesHeading: 'Popular services',
       viewAll: 'View all',
       viewAllServices: 'View all services',
@@ -433,7 +434,7 @@ export const en = {
     },
   },
   seo: {
-    siteName: 'Beauty Store',
+    siteName: 'Noora',
     home: {
       title: 'Beauty and ladies’ fashion',
       description: 'Shop ladies’ clothing and book beauty parlour services. Order on WhatsApp.',

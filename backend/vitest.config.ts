@@ -9,7 +9,11 @@ export default defineConfig({
     cloudflareTest({
       wrangler: { configPath: './wrangler.toml' },
       miniflare: {
-        bindings: { TEST_MIGRATIONS: migrations, SESSION_SECRET: 'test-only-session-secret' },
+        bindings: {
+          TEST_MIGRATIONS: migrations,
+          SESSION_SECRET: 'test-only-session-secret',
+          SITE_URL: '',
+        },
       },
     }),
   ],

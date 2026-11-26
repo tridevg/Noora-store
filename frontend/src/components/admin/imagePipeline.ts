@@ -6,8 +6,8 @@ export const FULL_MAX_EDGE = 1600;
 export const FULL_QUALITY = 0.82;
 export const THUMB_MAX_EDGE = 400;
 export const THUMB_QUALITY = 0.75;
-/** Decimal bytes, so the limit is also met when "3 MB" is read as 3,000,000. */
-export const FULL_MAX_BYTES = 3_000_000;
+/** Output limit for the full image (Phase 7): 500,000 bytes. The server enforces the same cap. */
+export const FULL_MAX_BYTES = 500_000;
 export const THUMB_MAX_BYTES = 300_000;
 export const JPEG_FALLBACK_QUALITY = 0.82;
 
@@ -88,7 +88,7 @@ export function evaluateVariant(
   return { ok: true, mime: blob.type };
 }
 
-/** File extension that matches the bytes, as required by UploadKeySchema. */
+/** File extension that matches the bytes. */
 export function extensionFor(mime: OutputMime): 'webp' | 'jpg' {
   return mime === 'image/webp' ? 'webp' : 'jpg';
 }

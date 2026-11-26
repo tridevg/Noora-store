@@ -1,7 +1,7 @@
 import { Hono } from 'hono';
 import {
   AdminProductListQuerySchema,
-  ImageCreateSchema,
+  ImageUploadFieldsSchema,
   ProductCreateSchema,
   ProductUpdateSchema,
   percentOff,
@@ -9,10 +9,19 @@ import {
   type ImageDto,
   type VariantDto,
 } from '@beauty-store/shared';
-import { apiError } from '../http/errors';
+import { apiError, issueFields } from '../http/errors';
 import { purgePublicCache } from '../cache/purge';
 import { clientOrigin } from './origin';
-import { deleteOrphanedObjects } from './r2Cleanup';
+import {
+  IMAGE_LIMIT_BYTES,
+  MULTIPART_OVERHEAD_BYTES,
+  deleteProductStatements,
+  isImageContentType,
+  linkImageWithBlobs,
+  readBounded,
+  unlinkImage,
+  type ImageBlob,
+} from './imageBlobs';
 import {
   dbWriteError,
   likePattern,
@@ -258,77 +267,119 @@ productsRoutes.put('/products/:id', async (c) => {
   return c.json({ product });
 });
 
-/** DELETE /api/admin/products/:id: removes the product's R2 objects first, then the row (FK cascade). */
+/** DELETE /api/admin/products/:id: removes the product, its image blobs and its rows in one batch. */
 productsRoutes.delete('/products/:id', async (c) => {
   const id = parseId(c.req.param('id'));
   const slug = id === null ? null : await productSlug(c.env.DB, id);
   if (id === null || slug === null) return apiError(c, 404, 'not_found', 'Product not found');
 
-  const images = await c.env.DB.prepare(
-    'SELECT r2_key, thumb_r2_key FROM product_images WHERE product_id = ?',
-  )
-    .bind(id)
-    .all<{ r2_key: string; thumb_r2_key: string }>();
-  for (const image of images.results) {
-    await c.env.IMAGES.delete([image.r2_key, image.thumb_r2_key]);
-  }
-
-  await c.env.DB.prepare('DELETE FROM products WHERE id = ?').bind(id).run();
+  await c.env.DB.batch(deleteProductStatements(c.env.DB, id));
   await purgePublicCache(clientOrigin(c.req.raw), [slug]);
   return c.body(null, 204);
 });
 
-/** POST /api/admin/products/:id/images: links two keys already uploaded. 409 if either object is missing. */
+/**
+ * POST /api/admin/products/:id/images: multipart/form-data with `full` and `thumb` file parts
+ * (image/webp or image/jpeg, within the size limits) and optional `alt_text` and `sort_order`.
+ * The blobs and the link are written in one D1 batch, so a failure leaves nothing behind.
+ */
 productsRoutes.post('/products/:id/images', async (c) => {
   const id = parseId(c.req.param('id'));
   const slug = id === null ? null : await productSlug(c.env.DB, id);
   if (id === null || slug === null) return apiError(c, 404, 'not_found', 'Product not found');
 
-  const parsed = await parseJson(c, (v) => ImageCreateSchema.safeParse(v));
-  if ('response' in parsed) return parsed.response;
-  const data = parsed.data;
-
-  const fullKeyProduct = data.full_r2_key.split('/')[1];
-  const thumbKeyProduct = data.thumb_r2_key.split('/')[1];
-  if (fullKeyProduct !== String(id) || thumbKeyProduct !== String(id)) {
-    return apiError(c, 400, 'validation_failed', 'Image keys belong to another product');
+  const maxBody = IMAGE_LIMIT_BYTES.full + IMAGE_LIMIT_BYTES.thumb + MULTIPART_OVERHEAD_BYTES;
+  const raw = await readBounded(c.req.raw.body, maxBody);
+  if (raw === 'too_large') {
+    return apiError(c, 413, 'validation_failed', 'Images exceed the size limits');
   }
-
-  const [full, thumb] = await Promise.all([
-    c.env.IMAGES.head(data.full_r2_key),
-    c.env.IMAGES.head(data.thumb_r2_key),
-  ]);
-  if (full === null || thumb === null) {
-    return apiError(c, 409, 'conflict', 'Upload both image objects before linking them');
-  }
-
-  let imageId: number;
+  let form: FormData;
   try {
-    const result = await c.env.DB.prepare(
-      `INSERT INTO product_images (product_id, r2_key, thumb_r2_key, alt_text, sort_order)
-       VALUES (?, ?, ?, ?, ?)`,
-    )
-      .bind(id, data.full_r2_key, data.thumb_r2_key, data.alt_text, data.sort_order)
-      .run();
-    imageId = result.meta.last_row_id;
+    form = await new Response(raw, {
+      headers: { 'Content-Type': c.req.header('Content-Type') ?? '' },
+    }).formData();
+  } catch {
+    return apiError(
+      c,
+      400,
+      'validation_failed',
+      'Expected multipart/form-data with full and thumb',
+    );
+  }
+
+  const textField = (name: string): string | undefined => {
+    const value = form.get(name);
+    return typeof value === 'string' ? value : undefined;
+  };
+  const meta = ImageUploadFieldsSchema.safeParse({
+    alt_text: textField('alt_text') ?? '',
+    sort_order: textField('sort_order') === undefined ? 0 : Number(textField('sort_order')),
+  });
+  if (!meta.success) {
+    return apiError(
+      c,
+      400,
+      'validation_failed',
+      'Invalid image fields',
+      issueFields(meta.error.issues),
+    );
+  }
+
+  const parts: Partial<Record<'full' | 'thumb', ImageBlob>> = {};
+  for (const variant of ['full', 'thumb'] as const) {
+    const file = form.get(variant);
+    if (!(file instanceof File)) {
+      return apiError(c, 400, 'validation_failed', `Missing ${variant} image`, {
+        [variant]: 'required',
+      });
+    }
+    if (!isImageContentType(file.type)) {
+      return apiError(c, 400, 'validation_failed', 'Images must be image/webp or image/jpeg', {
+        [variant]: 'unsupported type',
+      });
+    }
+    if (file.size === 0) {
+      return apiError(c, 400, 'validation_failed', `Empty ${variant} image`, {
+        [variant]: 'empty',
+      });
+    }
+    if (file.size > IMAGE_LIMIT_BYTES[variant]) {
+      return apiError(c, 413, 'validation_failed', `Image exceeds the ${variant} size limit`, {
+        [variant]: `over ${IMAGE_LIMIT_BYTES[variant]} bytes`,
+      });
+    }
+    parts[variant] = {
+      contentType: file.type,
+      data: new Uint8Array(await file.arrayBuffer()),
+    };
+  }
+
+  let linked: { id: number; fullKey: string; thumbKey: string };
+  try {
+    linked = await linkImageWithBlobs(c.env.DB, {
+      productId: id,
+      full: parts.full!,
+      thumb: parts.thumb!,
+      altText: meta.data.alt_text,
+      sortOrder: meta.data.sort_order,
+    });
   } catch (err) {
-    await deleteOrphanedObjects(c.env, [data.full_r2_key, data.thumb_r2_key]);
     return dbWriteError(c, err, 'insert');
   }
 
   await purgePublicCache(clientOrigin(c.req.raw), [slug]);
   const image = toImageDto({
-    id: imageId,
+    id: linked.id,
     product_id: id,
-    r2_key: data.full_r2_key,
-    thumb_r2_key: data.thumb_r2_key,
-    alt_text: data.alt_text,
-    sort_order: data.sort_order,
+    r2_key: linked.fullKey,
+    thumb_r2_key: linked.thumbKey,
+    alt_text: meta.data.alt_text,
+    sort_order: meta.data.sort_order,
   });
   return c.json({ image }, 201);
 });
 
-/** DELETE /api/admin/products/:id/images/:imageId: removes the row, then both R2 objects. */
+/** DELETE /api/admin/products/:id/images/:imageId: removes the link and both blobs in one batch. */
 productsRoutes.delete('/products/:id/images/:imageId', async (c) => {
   const id = parseId(c.req.param('id'));
   const imageId = parseId(c.req.param('imageId'));
@@ -336,17 +387,9 @@ productsRoutes.delete('/products/:id/images/:imageId', async (c) => {
   if (id === null || imageId === null || slug === null) {
     return apiError(c, 404, 'not_found', 'Image not found');
   }
-  const image = await c.env.DB.prepare(
-    'SELECT r2_key, thumb_r2_key FROM product_images WHERE id = ? AND product_id = ?',
-  )
-    .bind(imageId, id)
-    .first<{ r2_key: string; thumb_r2_key: string }>();
-  if (image === null) return apiError(c, 404, 'not_found', 'Image not found');
+  const removed = await unlinkImage(c.env.DB, id, imageId);
+  if (!removed) return apiError(c, 404, 'not_found', 'Image not found');
 
-  await c.env.DB.prepare('DELETE FROM product_images WHERE id = ? AND product_id = ?')
-    .bind(imageId, id)
-    .run();
-  await c.env.IMAGES.delete([image.r2_key, image.thumb_r2_key]);
   await purgePublicCache(clientOrigin(c.req.raw), [slug]);
   return c.body(null, 204);
 });

@@ -2,7 +2,7 @@
   "project": "beauty-fashion-store",
   "spec": "docs/superpowers/specs/2026-11-26-beauty-store-v1-design.md",
   "plan": "docs/superpowers/plans/implementation-plan.md",
-  "current_phase": 6,
+  "current_phase": 7,
   "phases": {
     "0": {
       "name": "EC2 env check, bootstrap, planning, state init",
@@ -34,8 +34,8 @@
       "note": "Lighthouse (user-space Playwright Chromium, mobile): home Perf 86 LCP 2.5s (target 90, <2.5s) FAIL; product Perf 94 LCP 2.4s PASS; A11y 100 and SEO 92 on both. Carried into Phase 7."
     },
     "7": {
-      "name": "Cloudflare deploy",
-      "status": "pending"
+      "name": "Noora card-free deploy (D1 images, Workers, Pages)",
+      "status": "deployed"
     }
   },
   "environment": {
@@ -126,6 +126,20 @@
         "seo": 92,
         "lcp_s": 2.4
       }
+    },
+    "phase7": {
+      "lighthouse_product_live": {
+        "perf": 92,
+        "lcp_s": 1.81,
+        "a11y": 100,
+        "seo": 100
+      },
+      "lighthouse_home_live": {
+        "perf": 96,
+        "lcp_s": 0.84,
+        "a11y": 100,
+        "seo": 100
+      }
     }
   },
   "decisions": [
@@ -147,6 +161,17 @@
     "3": "user approved 2026-11-26",
     "4": "user approved 2026-11-26",
     "5": "user approved 2026-11-26",
-    "6": "user approved 2026-11-26"
+    "6": "user approved 2026-11-26",
+    "7": "user approved 2026-11-26"
+  },
+  "deployment": {
+    "worker": "https://noora-api.tridev-g811.workers.dev",
+    "worker_version_note": "SITE_URL=https://noora-studio.pages.dev",
+    "pages_project": "noora-studio",
+    "storefront": "https://noora-studio.pages.dev",
+    "d1_database": "noora-db",
+    "d1_database_id": "96eebef2-a1ec-42a1-b049-476a3257dee6",
+    "seeded_products": 12,
+    "temporary_project_deleted": "noora (domain noora-2yi.pages.dev)"
   }
 }

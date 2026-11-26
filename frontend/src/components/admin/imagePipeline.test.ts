@@ -47,7 +47,7 @@ describe('evaluateVariant', () => {
     });
   });
 
-  it('enforces the full limit of 3 MB and the thumb limit of 300 KB inclusively', () => {
+  it('enforces the full limit of 500 KB and the thumb limit of 300 KB inclusively', () => {
     expect(evaluateVariant('full', { type: 'image/webp', size: FULL_MAX_BYTES }).ok).toBe(true);
     expect(evaluateVariant('full', { type: 'image/webp', size: FULL_MAX_BYTES + 1 })).toEqual({
       ok: false,

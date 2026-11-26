@@ -5,8 +5,9 @@ import { CartProvider } from './cart';
 import { StorefrontLayout } from './components/layout';
 import { t } from './i18n';
 import { apiGet } from './lib/api';
+// Home is in the entry chunk: its hero is the LCP element, so it must not wait for a second chunk.
+import HomePage from './pages/storefront/HomePage';
 
-const HomePage = lazy(() => import('./pages/storefront/HomePage'));
 const ProductsPage = lazy(() => import('./pages/storefront/ProductsPage'));
 const CategoryPage = lazy(() => import('./pages/storefront/CategoryPage'));
 const ProductDetailPage = lazy(() => import('./pages/storefront/ProductDetailPage'));
@@ -58,7 +59,7 @@ export const routes: RouteObject[] = [
   {
     element: <StorefrontLayout />,
     children: [
-      { index: true, element: page(HomePage) },
+      { index: true, element: <HomePage /> },
       { path: 'products', element: page(ProductsPage) },
       { path: 'category/:slug', element: page(CategoryPage) },
       { path: 'product/:slug', element: page(ProductDetailPage) },

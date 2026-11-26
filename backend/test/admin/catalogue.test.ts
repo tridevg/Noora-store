@@ -101,23 +101,29 @@ describe('products CRUD', () => {
     expect(res.json.error.fields.category_id).toBeDefined();
   });
 
-  it('deletes a product, removes its R2 objects, and cascades variants', async () => {
+  it('deletes a product, removes its image blobs, and cascades variants', async () => {
     const key = 'products/3/44444444-4444-4444-8444-444444444444-full.webp';
     const thumb = 'products/3/44444444-4444-4444-8444-444444444444-thumb.webp';
-    await env.IMAGES.put(key, new Uint8Array([1]), { httpMetadata: { contentType: 'image/webp' } });
-    await env.IMAGES.put(thumb, new Uint8Array([1]), {
-      httpMetadata: { contentType: 'image/webp' },
-    });
-    await env.DB.prepare(
-      'INSERT INTO product_images (product_id, r2_key, thumb_r2_key, alt_text, sort_order) VALUES (3, ?, ?, ?, 0)',
-    )
-      .bind(key, thumb, '')
-      .run();
+    await env.DB.batch([
+      env.DB.prepare(
+        "INSERT INTO product_image_blobs (key, content_type, data) VALUES (?, 'image/webp', X'01')",
+      ).bind(key),
+      env.DB.prepare(
+        "INSERT INTO product_image_blobs (key, content_type, data) VALUES (?, 'image/webp', X'01')",
+      ).bind(thumb),
+      env.DB.prepare(
+        'INSERT INTO product_images (product_id, r2_key, thumb_r2_key, alt_text, sort_order) VALUES (3, ?, ?, ?, 0)',
+      ).bind(key, thumb, ''),
+    ]);
 
     const res = await call('DELETE', '/api/admin/products/3');
     expect(res.status).toBe(204);
-    expect(await env.IMAGES.head(key)).toBeNull();
-    expect(await env.IMAGES.head(thumb)).toBeNull();
+    const blobs = await env.DB.prepare(
+      'SELECT COUNT(*) AS n FROM product_image_blobs WHERE key IN (?, ?)',
+    )
+      .bind(key, thumb)
+      .first<{ n: number }>();
+    expect(blobs?.n).toBe(0);
     const variants = await env.DB.prepare(
       'SELECT COUNT(*) AS n FROM product_variants WHERE product_id = 3',
     ).first<{ n: number }>();

@@ -1,6 +1,6 @@
 # Beauty Parlour & Ladies' Clothing Store
 
-Mobile-first storefront and admin for a small beauty parlour and ladies' clothing business in India. Runs entirely on the Cloudflare Free Tier (Pages, Workers, D1, R2).
+Mobile-first storefront and admin for a small beauty parlour and ladies' clothing business in India. Runs entirely on the Cloudflare Free Tier (Pages, Workers, D1).
 
 ## Prerequisites
 

@@ -22,8 +22,11 @@ describe('admin route gating', () => {
 
   it('enumerates the expected mutating admin routes', () => {
     const routes = mutatingAdminRoutes();
-    expect(routes.length).toBeGreaterThanOrEqual(15);
+    expect(routes.length).toBeGreaterThanOrEqual(14);
     const keys = routes.map((r) => `${r.method} ${r.path}`);
+    // PUT /api/admin/uploads was removed in Phase 7: images now arrive as multipart on the link route.
+    expect(keys).not.toContain('PUT /api/admin/uploads');
+    expect(keys).toContain('POST /api/admin/products/1/images');
     expect(keys).toContain('POST /api/admin/logout');
     expect(keys).toContain('PUT /api/admin/settings');
     expect(keys).toContain('PATCH /api/admin/orders/1/status');

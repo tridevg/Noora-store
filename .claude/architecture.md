@@ -10,7 +10,7 @@ Living document. Update when a flow, route or boundary changes. Contract details
 | API + image proxy | `backend/` | Hono on Cloudflare Workers (`wrangler dev` locally) | `/api/*`, `/images/*`, auth, cache headers, purge |
 | Shared | `shared/` | TypeScript source, no build step | Zod schemas, `formatPaise`, `percentOff`, WhatsApp builders, types |
 | Database | D1 binding `DB` | SQLite (local: `backend/.wrangler/state`) | Catalogue, orders, settings, admin, rate limits |
-| Object storage | R2 binding `IMAGES` | local R2 state in dev | WebP `thumb` and `full` objects |
+| Image storage | D1 table `product_image_blobs` (no R2 binding) | local D1 state in dev | WebP or JPEG `thumb` and `full` blobs, written in the same batch as the link |
 
 Free-tier rules: no KV, Durable Objects, Queues or Docker. The Worker never resizes or transcodes images.
 
@@ -26,7 +26,7 @@ EC2: Vite dev/preview 127.0.0.1:5173
       /api/*     -> http://127.0.0.1:8787
       /images/*  -> http://127.0.0.1:8787
         |
-EC2: wrangler dev 127.0.0.1:8787   (workerd, D1 + R2 local state)
+EC2: wrangler dev 127.0.0.1:8787   (workerd, local D1 state)
 ```
 
 Because the browser only ever talks to `localhost:5173`, there is no CORS. The Worker sees `request.url` as `http://127.0.0.1:8787/...`, so the `Secure` cookie flag stays off. That is the intended behaviour for this topology.
@@ -56,7 +56,7 @@ Admin UI -> PUT/POST/DELETE /api/admin/...  (session cookie + X-CSRF-Token)
 
 Purge covers the canonical public keys: `/api/categories`, `/api/products`, `/api/services`, `/api/settings`, plus `/api/products/<slug>` for every affected product. Query-string variants expire within 300 s.
 
-Images: `GET /images/<r2key>` streams the R2 object with `Cache-Control: public, max-age=31536000, immutable`. Object keys are content-unique (UUID in the name), so immutable caching is safe. Re-uploads get a new key.
+Images: `GET /images/<key>` reads the blob row from D1 and returns it with its stored Content-Type and `Cache-Control: public, max-age=31536000, immutable`. Object keys are content-unique (UUID in the name), so immutable caching is safe. Re-uploads get a new key.
 
 Orders: `POST /api/orders` checks the `order:<ip_hash>` rate limit first (5 orders per 15 min per IP hash, else `429` with `Retry-After: 900`), then writes to D1, returns the order ID, and only then does the browser open `https://wa.me/<whatsapp_number>?text=...`. No payment data is collected. The server recomputes every price from D1.
 
@@ -71,7 +71,7 @@ Runs in `/admin/products/:id` only. Never in the Worker.
    - `thumb`: long edge at most 400 px, `toBlob('image/webp', 0.75)`
 4. Format check. If `blob.type` is `image/webp`, keep it. If the browser falls back to another type (for example PNG), re-encode that variant with `toBlob('image/jpeg', 0.82)`. Accepted output is only `image/webp` or `image/jpeg`. No browser is rejected.
 5. Check output sizes: `full` ≤ 3 MB, `thumb` ≤ 300 KB (approved limits; the Worker enforces the same limits on the output).
-6. `PUT /api/admin/uploads?key=products/<productId>/<uuid>-full.<ext>`, then the same for `-thumb`. `<ext>` is `webp` or `jpg` to match the bytes. `UploadKeySchema` enforces the shape. The Worker stores the actual Content-Type in R2 metadata.
+6. `POST /api/admin/products/<productId>/images` as multipart (`full` and `thumb` parts). The Worker generates the keys, checks type and size (full ≤ 500 KB, thumb ≤ 300 KB), and writes both blobs and the link in one D1 batch. See `.claude/schema.md` Phase 7 additions.
 7. `POST /api/admin/products/:id/images` with `{ full_r2_key, thumb_r2_key, alt_text, sort_order }` links the rows.
 
 Module: `frontend/src/lib/webp.ts` exports `toWebpVariants(file: File): Promise<{ full: Blob; thumb: Blob }>`. Each blob is `image/webp` or `image/jpeg`.
@@ -176,4 +176,4 @@ Backend and frontend import `@beauty-store/shared` as TypeScript source through 
 ## Phase 5 status (frontend built)
 - Initial JS gzip: 134,547 bytes (limit 150,000). Every route is React.lazy; only StorefrontLayout and CartProvider are eager.
 - Storefront: /, /products, /category/:slug, /product/:slug, /services, /cart. Admin: /admin/login and the dashboard, products, products/:id, services, orders, and settings routes.
-- Known gaps: About, Contact, Shipping, Privacy and NotFound are still placeholders (Phase 6). Stock is not enforced at add-to-cart or checkout. Orphaned R2 objects are possible if the link POST fails. There are no image reorder or alt-text endpoints. Categories and settings in the admin are read from the public GET endpoints.
+- Known gaps: About, Contact, Shipping, Privacy and NotFound are still placeholders (Phase 6). Stock is not enforced at add-to-cart or checkout. There are no image reorder or alt-text endpoints. Categories and settings in the admin are read from the public GET endpoints.

@@ -68,10 +68,12 @@ export const VariantCreateSchema = VariantFields;
 /** PUT /api/admin/variants/:id (partial, includes stock). */
 export const VariantUpdateSchema = VariantFields.partial();
 
-/** POST /api/admin/products/:id/images. Keys come from a prior upload. */
-export const ImageCreateSchema = z.object({
-  full_r2_key: z.string().regex(/^products\/\d+\/[0-9a-f-]{36}-full\.(webp|jpg)$/),
-  thumb_r2_key: z.string().regex(/^products\/\d+\/[0-9a-f-]{36}-thumb\.(webp|jpg)$/),
+/**
+ * POST /api/admin/products/:id/images is multipart/form-data: `full` and `thumb` file parts
+ * (image/webp or image/jpeg) plus these text fields. The Worker stores both blobs and the link
+ * in one D1 batch and generates the keys itself.
+ */
+export const ImageUploadFieldsSchema = z.object({
   alt_text: z.string().max(200).default(''),
   sort_order: z.number().int().nonnegative().default(0),
 });

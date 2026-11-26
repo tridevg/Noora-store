@@ -6,4 +6,3 @@ export * from './schemas/common';
 export * from './schemas/catalogue';
 export * from './schemas/orders';
 export * from './schemas/admin';
-export * from './schemas/uploads';

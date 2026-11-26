@@ -1,9 +1,9 @@
 # Beauty Parlour & Ladies' Clothing Store — Project Instructions
 
-Mobile-first e-commerce and services site for a small beauty parlour and ladies' clothing business in India. Target production: 100% Cloudflare Free Tier (Pages, Workers, D1, R2).
+Mobile-first e-commerce and services site for a small beauty parlour and ladies' clothing business in India. Target production: 100% Cloudflare Free Tier (Pages, Workers, D1).
 
 ## Status
-- Current phase: **Phase 6 partial** (home Lighthouse 86 / LCP 2.5 s below target; product page passes). Carried into Phase 7. Phase 7 approved by user.
+- Current phase: **Phase 7 deployed** (Noora on Cloudflare free tier). Storefront https://noora-studio.pages.dev, API https://noora-api.tridev-g811.workers.dev. Admin password to be rotated by the user.
 - Node v22.23.5 and npm 10.9.9 installed.
 - Git: local only, no remote. Working branch is `dev`.
 
@@ -23,9 +23,9 @@ Mobile-first e-commerce and services site for a small beauty parlour and ladies'
 
 ## Non-Negotiable Rules
 - **Money:** INTEGER paise everywhere. Never floats.
-- **Worker CPU:** Never resize/transcode images in the Worker. `thumb` + `full` are made client-side in `/admin` (canvas / `createImageBitmap`) before R2 upload. Encode WebP (q 0.82 full, 0.75 thumb); if the browser falls back, re-encode JPEG at q 0.82. Accept only `image/webp` or `image/jpeg`; store the actual Content-Type in R2 metadata. Do not reject any browser. Output limits: `full` ≤ 3 MB, `thumb` ≤ 300 KB.
+- **Worker CPU:** Never resize/transcode images in the Worker. `thumb` + `full` are made client-side in `/admin` (canvas / `createImageBitmap`) before upload. Encode WebP (q 0.82 full, 0.75 thumb); if the browser falls back, re-encode JPEG at q 0.82. Accept only `image/webp` or `image/jpeg`; store the actual Content-Type with the blob in D1. Do not reject any browser. Output limits: `full` ≤ 500 KB, `thumb` ≤ 300 KB (Phase 7, lowered from 3 MB).
 - **Caching:** Public `GET /api/products`, `/api/categories`, `/api/services`, `/api/settings` send `Cache-Control: public, s-maxage=300, stale-while-revalidate=60`; admin mutations purge via `caches.default`.
-- **R2 images:** `Cache-Control: public, max-age=31536000, immutable`.
+- **Image blobs (D1 `product_image_blobs`):** `Cache-Control: public, max-age=31536000, immutable`.
 - **No** KV, Durable Objects, Queues, Docker, or `docker-compose.yml`. Zero paid dependencies.
 - **Auth cookie:** `HttpOnly`, `SameSite=Strict`, HMAC-SHA256 signed; `Secure` only when `request.url.startsWith('https://')`.
 - **CSRF:** double-submit token on all admin mutations.

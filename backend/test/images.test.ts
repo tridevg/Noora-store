@@ -3,11 +3,13 @@ import { describe, expect, it } from 'vitest';
 
 const JPEG_KEY = 'products/9/22222222-2222-4222-8222-222222222222-full.jpg';
 
-describe('GET /images/*', () => {
-  it('streams the R2 object with its stored Content-Type and the immutable cache header', async () => {
-    await env.IMAGES.put(JPEG_KEY, new Uint8Array([0xff, 0xd8, 0xff, 0xd9]), {
-      httpMetadata: { contentType: 'image/jpeg' },
-    });
+describe('GET /images/* reads D1 blobs', () => {
+  it('returns the stored bytes with their stored Content-Type and the immutable cache header', async () => {
+    await env.DB.prepare(
+      "INSERT INTO product_image_blobs (key, content_type, data) VALUES (?, 'image/jpeg', ?)",
+    )
+      .bind(JPEG_KEY, new Uint8Array([0xff, 0xd8, 0xff, 0xd9]))
+      .run();
     const res = await SELF.fetch(`http://localhost/images/${JPEG_KEY}`);
     expect(res.status).toBe(200);
     expect(res.headers.get('Content-Type')).toBe('image/jpeg');
