@@ -190,7 +190,7 @@
     "seeded_products": 12,
     "temporary_project_deleted": "noora (domain noora-2yi.pages.dev)",
     "admin_password_status": "rotation in progress by user",
-    "admin_credentials_file": "to be deleted by user"
+    "admin_credentials_file": "deleted by user"
   },
   "signoff": {
     "phase_7": "signed off by user",
@@ -202,7 +202,6 @@
     ],
     "user_actions_pending": [
       "rotate admin password via /admin",
-      "delete /home/ubuntu/admin.txt",
       "remove unused ADMIN_PASSWORD_HASH Worker secret"
     ],
     "phase_8": "not needed now"
