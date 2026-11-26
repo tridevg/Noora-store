@@ -104,3 +104,14 @@ Open: R17 (_redirects proxy for Phase 7) not approved. Lighthouse needs a Chromi
   - Inter is named in `--bs-font-sans` but not loaded. Body text uses the system stack.
   - Google Fonts is a third-party dependency (Cormorant Garamond, Plus Jakarta Sans). Not self-hosted.
   - Button fill `#5E6D5F` chosen for AA contrast (white on `#7A8B7B` fails).
+
+## 2026-11-26 — Phase 8 follow-up: skincare nav, product LCP, deploy, Lighthouse
+- Skincare nav: header link changed from `/category/skincare` (no such slug) to `/category/skin`. Footer has no skincare link. `/category/skin` returns 200 and renders the "No products match these filters." notice (the API returns 0 items, not an error); heading shows the generic "Shop" title because `skin` is not a product category. `/category/makeup` (header) has the same problem: makeup is a service slug, so it shows the same empty state. Not changed; decide whether to point it elsewhere.
+- LCP: `ProductGallery` main image gets `loading="eager"` (fetchpriority high, async decode, width/height already set). Thumbnails were already `loading="lazy"`. `index.html` already had both preconnects and the non-blocking stylesheet (media=print swap), so no change. No image preload: the URL is not known in the initial HTML.
+- LCP result: no improvement. Audit breakdown shows resource load delay about 0.7-0.8 s (image discovered only after the product API responds), TTFB 45 ms, load duration 93 ms, render delay about 100 ms. The product API waterfall is the remaining lever; data loading was not changed per instructions.
+- Deploy: `cd frontend && npx wrangler pages deploy dist --project-name=noora-studio --branch=main` to https://b6918996.noora-studio.pages.dev, build index-B-X-fxzR. `/api/settings` 200 application/json; `/robots.txt` 200 text/plain.
+- Gates: typecheck 0, lint 0, format:check 0, npm test 27/120/47, build 0, check:bundle 118,838 bytes gzip (limit 150,000).
+- Lighthouse mobile, 3 runs each, perf/a11y/seo, live site:
+  - Product `/product/oxidised-jhumka-earrings` before: Perf 93/93/93, LCP 2.83/2.84/2.82 s, CLS 0. After: Perf 91/93/92, LCP 2.83/2.84/2.82 s, CLS 0. A11y 100, SEO 100 throughout.
+  - Home `/` before: Perf 88/95/96, LCP 0.89/0.88/0.92 s. After: Perf 93/96/94, LCP 0.89/0.87/0.88 s. A11y 100, SEO 100.
+- Open: product LCP still about 2.8 s against the 1.8 s target. Needs the product API to respond sooner (or a data-loading change, out of scope here). Fonts are not self-hosted; the stylesheet is not render-blocking.

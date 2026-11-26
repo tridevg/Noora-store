@@ -12,7 +12,7 @@ const SEARCH_DEBOUNCE_MS = 300;
 const NAV_LINKS = [
   { to: '/services', label: 'nav.salonServices' },
   { to: '/products', label: 'nav.catalogue' },
-  { to: '/category/skincare', label: 'nav.skincare' },
+  { to: '/category/skin', label: 'nav.skincare' },
   { to: '/category/makeup', label: 'nav.makeup' },
   { to: '/about', label: 'nav.ourStory' },
 ] as const;

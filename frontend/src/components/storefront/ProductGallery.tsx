@@ -39,6 +39,7 @@ export function ProductGallery({ images, alt }: { images: readonly ImageDto[]; a
           alt={current.alt_text || alt}
           width={1600}
           height={1600}
+          loading="eager"
           fetchPriority="high"
           decoding="async"
           style={zoomed ? { transform: 'scale(2)', transformOrigin: origin } : undefined}

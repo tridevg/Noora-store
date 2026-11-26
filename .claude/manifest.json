@@ -173,22 +173,22 @@
       "lint": 0,
       "format_check": 0,
       "build": 0,
-      "check_bundle_gzip_bytes": 118836,
+      "check_bundle_gzip_bytes": 118838,
       "limit_bytes": 150000,
       "lighthouse_home_mobile": {
-        "perf": "94-98",
+        "perf": "93-96",
         "a11y": 100,
         "seo": 100
       },
       "lighthouse_product_mobile": {
         "url": "/product/oxidised-jhumka-earrings",
-        "perf": "91-92",
+        "perf": "91-93",
         "a11y": 100,
         "seo": 100,
-        "lcp_s": 2.8,
-        "lcp_note": "audit still 2.8 s; gallery image waits for JS chunk and product API"
+        "lcp_s": 2.83,
+        "lcp_note": "Before and after the LCP fix (eager, fetchpriority=high, async decode) the audit stays at 2.82-2.84 s. Breakdown: resource load delay ~0.7-0.8 s (image is not discoverable in the initial HTML; it renders after the product API response), so the API waterfall is the remaining lever."
       },
-      "note": "Gates: npm test 27/120/47 (shared/backend/frontend)."
+      "note": "Gates: npm test 27/120/47 (shared/backend/frontend). LCP follow-up 2026-11-26: nav /category/skincare changed to /category/skin; gallery image marked loading=eager; deployed production build index-B-X-fxzR (deployment b6918996). Gates: typecheck, lint, format:check, build all exit 0; check:bundle 118838 bytes gzip."
     }
   },
   "decisions": [
@@ -234,8 +234,10 @@
     "worker_secrets": [
       "SESSION_SECRET"
     ],
-    "production_build": "index-BTEby1bs",
+    "production_build": "index-B-X-fxzR",
     "phase8_final_deployment": "https://3e75dd7b.noora-studio.pages.dev",
+    "phase8_lcp_followup_deployment": "https://b6918996.noora-studio.pages.dev",
+    "phase8_lcp_followup_build": "index-B-X-fxzR",
     "frontend_deploy_command": "cd frontend && npx wrangler pages deploy dist --project-name=noora-studio --branch=main"
   },
   "signoff": {
