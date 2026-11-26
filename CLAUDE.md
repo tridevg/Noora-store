@@ -22,6 +22,7 @@ Mobile-first e-commerce and services site for a small beauty parlour and ladies'
 - `.claude/manifest.json` — phase status, files, migrations, endpoints, env vars, test results
 - `.claude/scratchpad.md` — decisions, handoffs, blockers
 - `endpoints.txt` — API routes, auth, CSRF, caching, deploy commands
+- `setup.txt` — macOS setup, Cloudflare login and connectivity checks, local dev, deploy steps (onboarding; no secrets)
 - `docs/superpowers/plans/implementation-plan.md` — original plan; a close-out banner at the top lists where shipped decisions supersede it
 
 ## Non-Negotiable Rules

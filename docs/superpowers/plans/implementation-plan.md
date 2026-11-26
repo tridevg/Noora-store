@@ -7,7 +7,7 @@
 
 No app code exists yet. Phase 1 starts only after Node 22 is installed and the user approves this plan. This file is a checklist: behaviour and contracts live in the docs above.
 
-> **Close-out status (2026-11-26):** Phases 0–5 verified and committed. Phase 6 committed as partial (home Lighthouse below target), then the home page passed on the live site in Phase 7. Phase 7 deployed and signed off. Live: https://noora-studio.pages.dev (storefront), https://noora-api.tridev-g811.workers.dev (API). The checklist below is the original plan. Where it conflicts with what shipped, these decisions win:
+> **Close-out status (2026-11-26):** Phases 0–5 verified and committed. Phase 6 committed as partial (home Lighthouse below target), then the home page passed on the live site in Phase 7. Phase 7 deployed and signed off. Phase 8 deployed (see the Phase 8 close-out below). Live: https://noora-studio.pages.dev (storefront), https://noora-api.tridev-g811.workers.dev (API). The checklist below is the original plan. Where it conflicts with what shipped, these decisions win:
 > - Images stored in D1 blobs, not R2 (card-free). Full cap 500 KB (R8 lowered from 3 MB); thumb 300 KB.
 > - Pages Functions (`frontend/functions/`) proxy `/api`, `/images`, `/sitemap.xml`, `/robots.txt`; `_redirects` is SPA fallback only (R17 superseded).
 > - Admin upload is one multipart POST to `/api/admin/products/:id/images` (supersedes the `PUT /api/admin/uploads` step in 4.5).
@@ -19,20 +19,21 @@ No app code exists yet. Phase 1 starts only after Node 22 is installed and the u
 
 ## Phase 8 close-out (2026-11-26): storefront reskin
 
-Frontend only; no schema, migration, `/api/*` or backend change. User approved; deployed to https://noora-studio.pages.dev (final deployment https://3e75dd7b.noora-studio.pages.dev, build `index-BTEby1bs`). Shipped design:
+Frontend only; no schema, migration, `/api/*` or backend change. User approved; deployed to https://noora-studio.pages.dev (final deployment https://3e75dd7b.noora-studio.pages.dev, build `index-BTEby1bs`). Follow-up commits `5945ba8` and `02b280d` (2026-11-26) added the product LCP work and nav repoint; current production baseline is commit `02b280d`, deployment `c91b5826`, build `index-C__s9c-a`. Shipped design:
 
 - **Tokens:** "Modern Minimal Sage & Cream" in `frontend/src/index.css` (replaces `styles/tokens.css`). Admin `--bs-*` set unchanged. Sage accent with `#5E6D5F` fill for buttons (white on `#7A8B7B` fails AA).
 - **Blocks:** slender sticky header, `HeroBentoBanner` (CSS gradient placeholder tiles, no image assets), `CategoryRail`, `NewArrivalsGrid`, product grid and card, footer, fixed mobile bottom nav with live Bag count.
 - **Bag drawer:** right-hand sheet (`CartDrawer` on `ui/Sheet`) opened from the header, bottom nav and Add to Bag. Checkout shared with `/cart` via `useCheckout`; server still recomputes prices and enforces `order:<ip_hash>`.
 - **Fonts:** Cormorant Garamond (display) and Plus Jakarta Sans (UI) from Google Fonts with `display=swap`, non-blocking stylesheet load, metric-tuned fallbacks. Not self-hosted.
-- **Product page:** `ProductDetailPage` in the entry chunk; skeleton sizing and a stable bottom-nav slot to limit CLS.
+- **Product page:** `ProductDetailPage` in the entry chunk; skeleton sizing and a stable bottom-nav slot to limit CLS. The main gallery image is `loading="eager"` with `fetchPriority="high"`; the Pages Function `frontend/functions/product/[slug].ts` adds a `Link` and `<link rel="preload">` for it (commit `02b280d`).
 
 Deviations from the original checklist:
 - No variant swatches on product cards: the list API carries no variant data. Quick add fetches the product detail.
-- Nav link `/category/skincare` has no matching category; closest real slug is `skin`. Unresolved.
+- Nav link `/category/skincare` has no matching category. Resolved 2026-11-26 (commit `02b280d`): header Skincare and Makeup link to `/services`, which has no per-category anchors. `/category/skin` (the earlier target) showed an empty state.
 - Hero tiles are CSS placeholders (approved), not photography.
+- Product LCP target (< 1.8 s) not met: 2.84 s median on the live product page. Waived by the user 2026-11-26. Inlining product JSON into the HTML was rejected because stock and price edits in `/admin` would need HTML cache invalidation. Product data stays on the single API path.
 
-Verification: typecheck, lint, format:check, `npm test` 27/120/47, build, bundle 118,836 bytes gzip (limit 150,000). Lighthouse mobile: home Perf 94-98, A11y 100, SEO 100; product Perf 91-92, A11y 100, SEO 100. Product LCP audit 2.8 s (Phase 7 measured 1.81 s): open item, next lever is a product API preload.
+Verification: typecheck, lint, format:check, `npm test` 27/120/47, build, bundle 118,832 bytes gzip (limit 150,000; latest gate, commit `02b280d`). Lighthouse mobile, 3 runs on the live site: home Perf 93-96 (median 95), A11y 100, SEO 100; product `/product/oxidised-jhumka-earrings` Perf 91-93 (median 93), A11y 100, SEO 100, LCP median 2.84 s, CLS 0.
 
 Deploy: run from `frontend/` with `--branch=main` so the Pages Functions bundle is included and the deploy goes to production (see CLAUDE.md).
 

@@ -15,7 +15,7 @@ Mobile-first storefront and admin for a small beauty parlour and ladies' clothin
 | `@beauty-store/backend`  | `backend/`  | Hono API on Cloudflare Workers, D1 migrations                 |
 | `@beauty-store/frontend` | `frontend/` | React + Vite + Tailwind storefront and `/admin`               |
 
-Design docs: `docs/superpowers/specs/`, implementation plan: `docs/superpowers/plans/implementation-plan.md`, contracts: `.claude/schema.md` and `.claude/architecture.md`.
+Design docs: `docs/superpowers/specs/`, implementation plan: `docs/superpowers/plans/implementation-plan.md`, contracts: `.claude/schema.md` and `.claude/architecture.md`. Mac onboarding and Cloudflare connectivity checks: `setup.txt`.
 
 ## Install
 

@@ -145,3 +145,8 @@ Open: R17 (_redirects proxy for Phase 7) not approved. Lighthouse needs a Chromi
   - Replace sample products and placeholder settings.
   - Admin hero tiles are placeholders.
 - Resume with: "start from last state" -> run `git status -sb`, `git log --oneline -3`, confirm origin/dev status, and check the live baseline (bundle name, `/api/settings`, product page Link header).
+
+## 2026-11-26 — Setup guide added (commit 5e76f1e)
+- `setup.txt` added: macOS prerequisites (Node 22, npm), clone and `dev` branch, Cloudflare device login, connectivity checks (`wrangler whoami`, D1 and Pages lists, `/api/settings`, `/api/health`, `robots.txt`), local dev with `backend/.dev.vars`, tests, deploy from `backend/` and `frontend/` with `--branch=main`, and Lighthouse via user-space Playwright Chromium.
+- No secrets in the file. Admin password stays out of the repo. Commit identity note only.
+- Docs sync (2026-11-26): setup.txt paths and npm scripts checked against the repo; listed in CLAUDE.md Source-of-Truth and the README design-docs line.

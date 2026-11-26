@@ -40,7 +40,7 @@
     "8": {
       "name": "Storefront reskin: Sage & Cream tokens, modular blocks",
       "status": "verified",
-      "note": "Frontend only. Deployed to production (build index-BTEby1bs, final deployment 3e75dd7b). Known gap: product page LCP audit 2.8 s (Phase 7 was 1.81 s); the gallery image waits for the JS chunk and the product API. Lever not yet pulled: preload the product API. Perf 91-92 on product still meets the 90 target."
+      "note": "Frontend only. Deployed to production (build index-BTEby1bs, final deployment 3e75dd7b; current production baseline build index-C__s9c-a, deployment c91b5826). Known gap: product page LCP 2.84 s median (Phase 7 was 1.81 s); the 1.8 s target is waived by the user (2026-11-26). Edge preload of the hero image added (frontend/functions/product/[slug].ts) but LCP unchanged. Product Perf 91-93 still meets the 90 target."
     }
   },
   "environment": {
@@ -80,9 +80,43 @@
   ],
   "files_pending_architect": [],
   "migrations_applied": [
-    "0001_init.sql (local)"
+    "0001_init.sql (local)",
+    "0002_image_blobs.sql (Phase 7 deploy; remote apply not re-verified in the 2026-11-26 docs sync; check with setup.txt 4c)"
   ],
-  "api_endpoints": [],
+  "api_endpoints": [
+    "GET /api/health",
+    "GET /api/categories",
+    "GET /api/products",
+    "GET /api/products/:slug",
+    "GET /api/services",
+    "GET /api/settings",
+    "POST /api/orders",
+    "GET /images/*",
+    "GET /sitemap.xml",
+    "GET /robots.txt",
+    "POST /api/admin/login",
+    "POST /api/admin/logout",
+    "GET /api/admin/session",
+    "GET /api/admin/dashboard",
+    "GET /api/admin/products",
+    "GET /api/admin/products/:id",
+    "POST /api/admin/products",
+    "PUT /api/admin/products/:id",
+    "DELETE /api/admin/products/:id",
+    "POST /api/admin/products/:id/variants",
+    "PUT /api/admin/variants/:id",
+    "DELETE /api/admin/variants/:id",
+    "POST /api/admin/products/:id/images",
+    "DELETE /api/admin/products/:id/images/:imageId",
+    "GET /api/admin/services",
+    "GET /api/admin/services/:id",
+    "POST /api/admin/services",
+    "PUT /api/admin/services/:id",
+    "DELETE /api/admin/services/:id",
+    "GET /api/admin/orders",
+    "PATCH /api/admin/orders/:id/status",
+    "PUT /api/admin/settings"
+  ],
   "env_vars": [
     "SESSION_SECRET (Worker secret)"
   ],
@@ -253,7 +287,7 @@
     "Phase 8: storefront palette Sage & Cream; button fill #5E6D5F (white on #7A8B7B fails AA); hero tiles are CSS gradient placeholders (no image assets)",
     "Phase 8: no variant swatches on product cards (list API carries no variant data); quick add uses GET /api/products/:slug",
     "Phase 8: frontend deploys from frontend/ working directory so Pages Functions bundle (wrangler 4 reads functions/ from cwd); deploy with --branch=main to publish to production, not preview",
-    "Phase 8: nav slug /category/skincare does not exist; closest real slug is skin (unresolved)",
+    "Phase 8: nav slug /category/skincare does not exist; resolved 2026-11-26 by pointing Skincare and Makeup nav to /services (/category/skin showed an empty state)",
     "Product LCP target (< 1.8 s) waived by user 2026-11-26; inline product JSON in HTML rejected (stock/price cache invalidation); baseline 02b280d / c91b5826"
   ],
   "phase_approvals": {
@@ -281,7 +315,8 @@
     "worker_secrets": [
       "SESSION_SECRET"
     ],
-    "production_build": "index-B-X-fxzR",
+    "production_build": "index-C__s9c-a",
+    "production_deployment": "https://c91b5826.noora-studio.pages.dev (live bundle index-C__s9c-a confirmed 2026-11-26)",
     "phase8_final_deployment": "https://3e75dd7b.noora-studio.pages.dev",
     "phase8_lcp_followup_deployment": "https://b6918996.noora-studio.pages.dev",
     "phase8_lcp_followup_build": "index-B-X-fxzR",
@@ -303,24 +338,25 @@
     "phase_8": "approved and deployed 2026-11-26 (final deployment 3e75dd7b)"
   },
   "docs_status": {
-    "CLAUDE.md": "synced 2026-11-26 (Phase 8 deployed; deploy from frontend/)",
-    "architecture.md": "synced (Phase 8 sections verified against code)",
-    "schema.md": "synced (Phase 8 note: no schema change)",
-    "endpoints.txt": "deploy section updated for frontend/ Functions bundle",
-    "implementation-plan.md": "close-out banner kept; Phase 8 section added",
-    "scratchpad.md": "Phase 8 entry added",
-    "README.md": "deploy section updated"
+    "CLAUDE.md": "synced 2026-11-26 (Phase 8 deployed; deploy from frontend/; setup.txt listed in Source-of-Truth)",
+    "architecture.md": "synced 2026-11-26 (Phase 8 sections verified against code; edge preload, nav repoint, eager gallery image, LCP waiver)",
+    "schema.md": "synced 2026-11-26 (Phase 8 note: no schema, migration or /api contract change; backend and shared diff empty since 44df1b6)",
+    "endpoints.txt": "verified 2026-11-26 against backend routes; deploy section matches CLAUDE.md",
+    "implementation-plan.md": "close-out banner and Phase 8 close-out section synced 2026-11-26; original checklist unchanged",
+    "scratchpad.md": "Phase 8 entries and follow-ups present; setup.txt entry added",
+    "README.md": "deploy section verified; setup.txt pointer added",
+    "setup.txt": "onboarding file added in 5e76f1e; paths and scripts verified 2026-11-26"
   },
-  "last_commit_docs": "f2df097",
+  "last_commit_docs": "5e76f1e",
   "session_state": {
     "date": "2026-11-26",
-    "where": "Phase 8 done. Production baseline live: commit 02b280d, build index-C__s9c-a, deployment c91b5826. Product LCP target waived by user; single API data path kept (no inlined product JSON). Docs committed at f18b2d5.",
+    "where": "Phase 8 done. Production baseline live: commit 02b280d, build index-C__s9c-a, deployment c91b5826. Product LCP target waived by user; single API data path kept (no inlined product JSON). Docs committed through 5e76f1e (setup.txt).",
     "last_commits": [
+      "5e76f1e",
+      "6d9057a",
       "f18b2d5",
       "02b280d",
-      "f2df097",
-      "056c2aa",
-      "5945ba8"
+      "f2df097"
     ],
     "open_items": [
       "Git push: user runs `! git push` (local dev is ahead of origin/dev).",

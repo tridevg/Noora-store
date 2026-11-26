@@ -299,8 +299,8 @@ Errors: `400 validation_failed` (missing or non-image part, empty part, bad fiel
 
 ### Phase 8 note (2026-11-26, storefront reskin)
 - The Sage & Cream storefront reskin changes **no** D1 schema, migrations, or `/api/*` Zod contracts. The changes are frontend only (`frontend/`: CSS tokens, components, cart drawer, font loading).
-- DDL confirmed unaltered: `backend/migrations/0001_init.sql` and `backend/migrations/0002_image_blobs.sql` have no uncommitted changes, and `git diff HEAD -- backend shared` is empty. No migration was added.
-- Endpoints used by the storefront are unchanged: `GET /api/products` (incl. `sort=newest`), `GET /api/products/:slug`, `GET /api/categories`, `GET /api/services`, `GET /api/settings`, and `POST /api/orders` (the order is still placed, then the browser opens `wa.me`).
+- DDL confirmed unaltered: `backend/migrations/0001_init.sql` and `backend/migrations/0002_image_blobs.sql` have no uncommitted changes, and `git diff HEAD -- backend shared` is empty. No migration was added. Re-verified 2026-11-26: `git diff --stat 44df1b6 HEAD -- backend shared migrations` is empty through `5e76f1e`; the Phase 8 follow-up commits `5945ba8` and `02b280d` touched only `frontend/` and `.claude/`.
+- Endpoints used by the storefront are unchanged: `GET /api/products` (incl. `sort=newest`), `GET /api/products/:slug`, `GET /api/categories`, `GET /api/services`, `GET /api/settings`, and `POST /api/orders` (the order is still placed, then the browser opens `wa.me`). The Pages Function `frontend/functions/product/[slug].ts` reads `GET /api/products/:slug` server-side for the preload only; it adds no endpoint.
 
 ## Additional route (Phase 3 audit)
 - `GET /api/health` — returns `{"ok": true}`. Not part of the public contract table; used for smoke checks only.
