@@ -52,7 +52,7 @@
     "chromium": null,
     "blockers": [],
     "apt_browser_libs_installed": "libnss3, libgbm1, libatk*, libcups2t64, libasound2t64, libxss1 and deps, installed 2026-11-26 10:33 by verifier; kept (full purge would remove plymouth/udisks2)",
-    "repository": "git initialised; branch dev; local only, no remote"
+    "repository": "git initialised; branch dev; remote origin https://github.com/tridevg/Noora-store.git"
   },
   "files_created": [
     "docs/superpowers/specs/2026-11-26-beauty-store-v1-design.md",

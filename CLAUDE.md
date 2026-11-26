@@ -5,7 +5,7 @@ Mobile-first e-commerce and services site for a small beauty parlour and ladies'
 ## Status
 - Current phase: **Phase 7 signed off** (Noora live). No further phases planned. Admin password rotation is the user's action.
 - Node v22.23.5 and npm 10.9.9 installed.
-- Git: local only, no remote. Working branch is `dev`.
+- Git: remote `origin` = https://github.com/tridevg/Noora-store.git. Working branch `dev` (tracks origin/dev).
 
 ## Workspace Layout (created)
 - `/frontend` — React + Vite + TypeScript (strict), Tailwind, React Router → Cloudflare Pages
