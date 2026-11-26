@@ -1,0 +1,172 @@
+NOORA - MACBOOK SETUP AND CLOUDFLARE CONNECTIVITY
+=================================================
+
+Run every command from the Terminal app. Paths are relative to the repo root
+unless stated. Never paste secret values, the admin password, or tokens into
+this file, the repo, or chat.
+
+
+1. PREREQUISITES (macOS)
+------------------------
+1a. Install Homebrew (skip if present):
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+1b. Install Node 22 LTS (package.json engines: node >=22):
+brew install node@22
+1c. If brew does not link node@22 onto PATH, follow the caveats printed by brew, or use nvm instead:
+brew install nvm
+nvm install 22
+nvm use 22
+1d. Verify Node and npm (npm 10 or later is expected by README.md):
+node -v
+npm -v
+1e. Verify git:
+git --version
+1f. Optional, for GitHub CLI:
+brew install gh
+gh auth login
+
+
+2. CLONE AND BRANCH
+-------------------
+2a. Clone the repo:
+git clone https://github.com/tridevg/Noora-store.git beauty-fashion-store
+2b. Enter the repo:
+cd beauty-fashion-store
+2c. Switch to the working branch (dev tracks origin/dev):
+git checkout dev
+2d. Install all workspaces (shared, backend, frontend) from the root:
+npm install
+2e. Confirm the branch is clean:
+git status
+2f. Git push note: on macOS, git uses the osxkeychain credential helper, or gh auth login.
+The owner runs pushes manually (git push), not the agent.
+
+
+3. CLOUDFLARE LOGIN
+-------------------
+3a. Browser flow (default on macOS; opens a browser):
+npx wrangler login
+3b. Device flow, as used on the EC2 machine (prints a code to enter in a browser):
+npx wrangler login --device --browser=false
+3c. Verify the login and account membership (no secrets shown):
+npx wrangler whoami
+
+
+4. CONNECTIVITY CHECKS
+----------------------
+4a. Account and identity:
+npx wrangler whoami
+4b. List remote D1 databases (expect noora-db):
+npx wrangler d1 list
+4c. Remote migration status for noora-db (run from backend/ so wrangler.toml is found):
+cd backend && npx wrangler d1 migrations list noora-db --remote && cd ..
+4d. List Pages projects (expect noora-studio):
+npx wrangler pages project list
+4e. Storefront API proxy through Pages (expect JSON):
+curl -s https://noora-studio.pages.dev/api/settings
+4f. Worker health (expect {"ok":true}):
+curl -s https://noora-api.tridev-g811.workers.dev/api/health
+4g. Storefront robots.txt headers (expect HTTP 200):
+curl -sI https://noora-studio.pages.dev/robots.txt
+
+
+5. LOCAL DEV
+------------
+5a. Create the local Worker secrets file (backend/.dev.vars, gitignored):
+openssl rand -hex 32
+5b. Write it as a single line, replacing <hex> with the value from 5a:
+echo "SESSION_SECRET=<hex>" > backend/.dev.vars
+5c. Note: this SESSION_SECRET is local only. It is the HMAC key for local
+    admin sessions. It does NOT need to match production. Never commit
+    backend/.dev.vars (.gitignore lists .dev.vars and *.local).
+5d. Apply migrations to the local D1 database (migrations dir is backend/migrations):
+cd backend && npx wrangler d1 migrations apply noora-db --local && cd ..
+5e. Start the Worker (terminal 1; binds 127.0.0.1:8787):
+npm run dev -w @beauty-store/backend
+5f. Start the Vite frontend (terminal 2; binds 127.0.0.1:5173, proxies /api and /images to 8787):
+npm run dev -w @beauty-store/frontend
+5g. Open in a browser: http://127.0.0.1:5173
+5h. Combined alternative (both servers in one terminal):
+npm run dev
+5i. Remote SSH preview (run on the laptop, only if the dev server is on a remote host):
+ssh -L 5173:localhost:5173 ubuntu@<ec2-ip>
+
+
+6. TESTS AND CHECKS
+-------------------
+6a. All unit tests (Vitest in every workspace; backend uses Miniflare):
+npm test
+6b. Typecheck every workspace:
+npm run typecheck
+6c. Typecheck shared only:
+npx tsc --noEmit -p shared/tsconfig.json
+6d. Typecheck backend only:
+npx tsc --noEmit -p backend/tsconfig.json
+6e. Typecheck frontend only:
+npx tsc --noEmit -p frontend/tsconfig.json
+6f. Lint (ESLint, typescript-eslint):
+npm run lint
+6g. Format check (Prettier, read-only):
+npm run format:check
+6h. Production frontend build (writes frontend/dist):
+npm run build -w @beauty-store/frontend
+6i. Bundle size check (run after 6h):
+npm run check:bundle -w @beauty-store/frontend
+
+
+7. DEPLOY
+---------
+Deploy only after the checks in section 6 pass. Deploys go to live production.
+7a. Backend Worker noora-api (run from backend/ so wrangler.toml is used):
+cd backend && npx wrangler deploy && cd ..
+7b. Build the frontend first:
+npm run build -w @beauty-store/frontend
+7c. Frontend to Cloudflare Pages (run from frontend/ so the Pages Functions bundle in frontend/functions is included):
+cd frontend && npx wrangler pages deploy dist --project-name=noora-studio --branch=main && cd ..
+7d. Why frontend/ and not the repo root: deploying from the root omits frontend/functions.
+7e. Why --branch=main: it publishes to production. Without it, a branch deploy is a preview only.
+7f. Verify after deploying: repeat 4e, 4f and 4g.
+
+
+8. LIGHTHOUSE AUDIT
+-------------------
+8a. Install Playwright Chromium in user space (no sudo, no apt):
+npx playwright install chromium
+8b. Local audit. Requires 5e and 5f running. The npm script hardcodes http://127.0.0.1:5173/ and writes ./lighthouse-report.json:
+npm run audit:lighthouse
+8c. Find the Playwright Chromium path (used as CHROME_PATH for a live audit):
+node -e "console.log(require('playwright').chromium.executablePath())"
+8d. Live audit of the storefront (replace <chromium-path> with the output of 8c; output goes outside the repo):
+CHROME_PATH="<chromium-path>" npx lighthouse https://noora-studio.pages.dev/ --chrome-flags="--headless --no-sandbox" --only-categories=performance,accessibility,seo --output=json --output-path="$HOME/noora-lighthouse-live.json" --quiet
+
+
+9. SECRETS
+----------
+9a. The production Worker secret SESSION_SECRET is already set in Cloudflare. It does
+    not need to be set again on the Mac. Do not run "wrangler secret put" unless rotating it.
+9b. List Worker secret NAMES only (run from backend/; output shows names, never values):
+cd backend && npx wrangler secret list && cd ..
+9c. Admin password is NOT in the repo, this file, or any .dev.vars shared file. The
+    owner keeps it. Rotate it through /admin after login. Never paste it anywhere.
+
+
+10. LIVE URLS AND PROJECT FACTS
+-------------------------------
+Storefront:            https://noora-studio.pages.dev  (Pages project noora-studio)
+API (Worker):          https://noora-api.tridev-g811.workers.dev  (Worker noora-api)
+Admin login:           https://noora-studio.pages.dev/admin/login
+D1 database:           noora-db
+D1 database id:        96eebef2-a1ec-42a1-b049-476a3257dee6  (from backend/wrangler.toml)
+D1 binding in Worker:  DB
+Worker vars:           SITE_URL = https://noora-studio.pages.dev  (backend/wrangler.toml)
+Production branch:     main  (Pages deploys with --branch=main)
+Development branch:    dev  (git working branch, tracks origin/dev)
+Repo:                  https://github.com/tridevg/Noora-store.git
+
+
+11. NOTES
+---------
+11a. This file contains no secrets. Do not add tokens, passwords, or secret values to it.
+11b. The workers.dev subdomain (tridev-g811) belongs to the account owner.
+11c. backend/.dev.vars holds the local SESSION_SECRET only. It is gitignored.
+11d. Commit only with the user's identity (see the repo owner's instructions).
