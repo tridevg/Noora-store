@@ -1,0 +1,12 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+
+# Cloudflare local state (D1, R2 emulation)
+.wrangler/
+
+# Local secrets and overrides
+.dev.vars
+*.local

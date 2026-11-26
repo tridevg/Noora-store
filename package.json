@@ -1,0 +1,32 @@
+{
+  "name": "beauty-fashion-store",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "shared",
+    "backend",
+    "frontend"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "concurrently -n api,web -c blue,green \"npm run dev -w @beauty-store/backend\" \"npm run dev -w @beauty-store/frontend\"",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present",
+    "lint": "eslint .",
+    "format": "prettier --write package.json tsconfig.base.json eslint.config.js .prettierrc.json README.md shared backend frontend --ignore-path .gitignore",
+    "format:check": "prettier --check package.json tsconfig.base.json eslint.config.js .prettierrc.json README.md shared backend frontend --ignore-path .gitignore",
+    "build": "npm run build --workspaces --if-present"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "concurrently": "^10.0.7",
+    "eslint": "^10.15.0",
+    "globals": "^17.0.0",
+    "prettier": "^3.10.1",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.74.0",
+    "vitest": "^5.1.2"
+  }
+}

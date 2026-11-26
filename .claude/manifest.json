@@ -1,0 +1,87 @@
+{
+  "project": "beauty-fashion-store",
+  "spec": "docs/superpowers/specs/2026-11-26-beauty-store-v1-design.md",
+  "plan": "docs/superpowers/plans/implementation-plan.md",
+  "current_phase": 1,
+  "phases": {
+    "0": {
+      "name": "EC2 env check, bootstrap, planning, state init",
+      "status": "verified"
+    },
+    "1": {
+      "name": "Monorepo scaffold",
+      "status": "in_progress"
+    },
+    "2": {
+      "name": "Shared package (Zod, paise, WhatsApp)",
+      "status": "pending"
+    },
+    "3": {
+      "name": "Backend public API + D1 migrations + seed",
+      "status": "pending"
+    },
+    "4": {
+      "name": "Backend admin API (auth, CRUD, cache purge)",
+      "status": "pending"
+    },
+    "5": {
+      "name": "Frontend storefront + admin UI",
+      "status": "pending"
+    },
+    "6": {
+      "name": "Verification (tsc, Vitest, bundle, Lighthouse)",
+      "status": "pending"
+    },
+    "7": {
+      "name": "Cloudflare deploy",
+      "status": "pending"
+    }
+  },
+  "environment": {
+    "os": "Ubuntu 26.04.1 LTS",
+    "kernel": "7.0.0-1018-aws",
+    "glibc": "2.43",
+    "glibc_ok_for_workerd": true,
+    "node": "v22.23.5",
+    "npm": "10.9.9",
+    "git": "2.53.0",
+    "cpu_cores": 2,
+    "ram": "3.7Gi",
+    "disk_free": "45G",
+    "chromium": null,
+    "blockers": []
+  },
+  "files_created": [
+    "docs/superpowers/specs/2026-11-26-beauty-store-v1-design.md",
+    "CLAUDE.md",
+    ".claude/manifest.json",
+    ".claude/scratchpad.md",
+    "package.json",
+    "package-lock.json",
+    "tsconfig.base.json",
+    "eslint.config.js",
+    ".prettierrc.json",
+    ".gitignore",
+    "README.md",
+    "shared/",
+    "backend/",
+    "frontend/"
+  ],
+  "files_pending_architect": [],
+  "migrations_applied": [],
+  "api_endpoints": [],
+  "env_vars": [],
+  "test_results": {},
+  "decisions": [
+    "Node 22 LTS",
+    "150 KB gzip JS budget",
+    "PBKDF2 100000 iterations",
+    "login limit 5 per 15 min",
+    "image limits 3 MB full / 300 KB thumb",
+    "canonical-key cache purge; filtered variants expire at s-maxage=300",
+    "browser WebP fallback to image/jpeg q0.82 accepted; real Content-Type stored in R2",
+    "rate_limits(key, attempted_at) replaces login_attempts; POST /api/orders capped 5 per 15 min per IP (deviates from spec table name, approved)",
+    "Phase 7 uses default *.pages.dev, *.workers.dev, r2.dev or /images/* route; custom domain optional",
+    "Phase 6 Lighthouse: @puppeteer/browsers chrome@stable or Playwright Chromium; no snap"
+  ]
+}

@@ -1,0 +1,18 @@
+@import 'tailwindcss';
+
+/*
+ * Design tokens: PLACEHOLDER values only. Real palette, type scale and radii
+ * are set in Phase 5 (.claude/architecture.md section 7). Tailwind v4 reads
+ * these through @theme, so components use token-backed utilities only.
+ */
+@theme {
+  --color-accent: #000000;
+  --color-surface: #ffffff;
+  --color-ink: #000000;
+  --color-muted: #6b6b6b;
+
+  --font-sans: system-ui, sans-serif;
+
+  --radius-card: 0.5rem;
+  --shadow-card: 0 1px 2px rgb(0 0 0 / 0.08);
+}
