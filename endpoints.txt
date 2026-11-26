@@ -1,0 +1,117 @@
+NOORA — API ENDPOINTS AND IMPORTANT DETAILS
+===========================================
+
+BASE URLS
+---------
+Storefront (also proxies /api, /images, /sitemap.xml, /robots.txt):
+  https://noora-studio.pages.dev
+Worker API (direct):
+  https://noora-api.tridev-g811.workers.dev
+Admin login page:
+  https://noora-studio.pages.dev/admin/login
+
+LOCAL DEV
+---------
+Worker:  http://127.0.0.1:8787
+Vite:    http://127.0.0.1:5173  (proxies /api and /images to 8787)
+
+PUBLIC ENDPOINTS (no auth)
+--------------------------
+GET  /api/health                      {"ok":true}  (Worker only)
+GET  /api/categories
+GET  /api/products                    filters: category, q, min_price, max_price,
+                                      size, colour, in_stock, sort, page, per_page
+GET  /api/products/:slug
+GET  /api/services
+GET  /api/settings                    business_name, whatsapp_number, address,
+                                      opening_hours, banner_text
+POST /api/orders                      body: customer_name, customer_phone, address,
+                                      items[{product_id, variant_id, qty}]
+                                      no prices accepted; server computes totals
+                                      409 with per-line detail if stock is short
+                                      rate limit: 5 orders per 15 min per IP
+GET  /images/:key                     image bytes from D1 (product_image_blobs)
+GET  /sitemap.xml
+GET  /robots.txt
+
+ADMIN ENDPOINTS
+---------------
+Auth: login sets cookies bs_admin (session, HttpOnly, SameSite=Strict)
+      and bs_csrf (CSRF token). Mutations need header X-CSRF-Token
+      equal to the bs_csrf cookie value.
+Errors: JSON envelope; 401 unauthenticated; 403 csrf_failed for a
+        present but foreign Origin or a bad CSRF token; 404 not_found;
+        409 conflict; 413 for images over the size cap; 429 rate limited
+        (Retry-After: 900).
+
+POST   /api/admin/login               body: username, password
+                                      rate limit: 5 failed attempts per 15 min
+POST   /api/admin/logout              clears both cookies
+GET    /api/admin/session             returns the current username
+GET    /api/admin/dashboard           order counts by status, 10 recent orders
+
+Products
+GET    /api/admin/products            page, per_page, q (includes inactive)
+GET    /api/admin/products/:id        includes inactive, variants, images
+POST   /api/admin/products            create product
+PUT    /api/admin/products/:id        partial update
+DELETE /api/admin/products/:id        also deletes its image blobs
+
+Variants
+POST   /api/admin/products/:id/variants   size, colour, sku, stock
+PUT    /api/admin/variants/:id            partial update, including stock
+DELETE /api/admin/variants/:id
+
+Images
+POST   /api/admin/products/:id/images     multipart: full, thumb (image/webp or
+                                          image/jpeg), optional alt_text, sort_order
+                                          full <= 500 KB, thumb <= 300 KB
+                                          link and both blobs in one D1 batch
+DELETE /api/admin/products/:id/images/:imageId
+
+Services
+GET    /api/admin/services            includes inactive
+GET    /api/admin/services/:id
+POST   /api/admin/services
+PUT    /api/admin/services/:id
+DELETE /api/admin/services/:id
+
+Orders
+GET    /api/admin/orders              status, page, per_page
+PATCH  /api/admin/orders/:id/status   new -> confirmed -> delivered | cancelled
+                                      409 on an illegal transition
+
+Settings
+PUT    /api/admin/settings            partial map of the five settings keys
+
+CACHING
+-------
+Public GET /api/products, /api/categories, /api/services, /api/settings:
+  Cache-Control: public, s-maxage=300, stale-while-revalidate=60
+Admin mutations purge the matching public cache entries (caches.default).
+Images /images/*: Cache-Control: public, max-age=31536000, immutable
+Admin responses: no-store
+
+SECURITY
+--------
+Passwords: PBKDF2 (Web Crypto), 100,000 iterations in production.
+Session cookie: HMAC-SHA256 signed; Secure only when the request URL
+  starts with https://.
+Worker secrets (names only): SESSION_SECRET
+Admin credentials are NOT stored in this file or the repo.
+  Rotate the admin password via /admin after first login.
+
+DATA NOTES
+----------
+Money: integer paise everywhere (1299 = Rs 1,299).
+Images: WebP or JPEG blobs stored in D1; no R2 bucket.
+Rate-limit table: rate_limits(key, attempted_at).
+
+DEPLOY
+------
+npx wrangler login --device --browser=false   (once)
+cd backend && npx wrangler deploy
+npx wrangler pages deploy frontend/dist --project-name=noora-studio
+
+Full contracts: .claude/schema.md
+Architecture:   .claude/architecture.md
