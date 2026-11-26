@@ -75,7 +75,9 @@
     "0001_init.sql (local)"
   ],
   "api_endpoints": [],
-  "env_vars": [],
+  "env_vars": [
+    "SESSION_SECRET (Worker secret)"
+  ],
   "test_results": {
     "phase2": {
       "shared_tests": "29 passed in 3 files",
@@ -190,7 +192,10 @@
     "seeded_products": 12,
     "temporary_project_deleted": "noora (domain noora-2yi.pages.dev)",
     "admin_password_status": "rotation in progress by user",
-    "admin_credentials_file": "deleted by user"
+    "admin_credentials_file": "deleted by user",
+    "worker_secrets": [
+      "SESSION_SECRET"
+    ]
   },
   "signoff": {
     "phase_7": "signed off by user",
@@ -201,8 +206,7 @@
       "D1 WebP blob storage"
     ],
     "user_actions_pending": [
-      "rotate admin password via /admin",
-      "remove unused ADMIN_PASSWORD_HASH Worker secret"
+      "rotate admin password via /admin"
     ],
     "phase_8": "not needed now"
   }
