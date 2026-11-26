@@ -8,10 +8,16 @@ export default defineConfig({
   plugins: [
     cloudflareTest({
       wrangler: { configPath: './wrangler.toml' },
-      miniflare: { bindings: { TEST_MIGRATIONS: migrations } },
+      miniflare: {
+        bindings: { TEST_MIGRATIONS: migrations, SESSION_SECRET: 'test-only-session-secret' },
+      },
     }),
   ],
   test: {
     setupFiles: ['./test/setup.ts'],
+    testTimeout: 30_000,
+    hookTimeout: 30_000,
+    maxWorkers: 1,
+    fileParallelism: false,
   },
 });

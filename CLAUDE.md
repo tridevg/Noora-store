@@ -3,7 +3,7 @@
 Mobile-first e-commerce and services site for a small beauty parlour and ladies' clothing business in India. Target production: 100% Cloudflare Free Tier (Pages, Workers, D1, R2).
 
 ## Status
-- Current phase: **Phase 3** (backend public API), approved by user. Phases 0–2 verified; Phases 0–1 committed 544112d, Phase 2 committed f4cd34d (dev).
+- Current phase: **Phase 5** (frontend), approved by user. Phases 0–4 verified and committed.
 - Node v22.23.5 and npm 10.9.9 installed.
 - Git: local only, no remote. Working branch is `dev`.
 

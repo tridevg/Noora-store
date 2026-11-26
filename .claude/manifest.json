@@ -2,7 +2,7 @@
   "project": "beauty-fashion-store",
   "spec": "docs/superpowers/specs/2026-11-26-beauty-store-v1-design.md",
   "plan": "docs/superpowers/plans/implementation-plan.md",
-  "current_phase": 3,
+  "current_phase": 4,
   "phases": {
     "0": {
       "name": "EC2 env check, bootstrap, planning, state init",
@@ -22,7 +22,7 @@
     },
     "4": {
       "name": "Backend admin API (auth, CRUD, cache purge)",
-      "status": "pending"
+      "status": "verified"
     },
     "5": {
       "name": "Frontend storefront + admin UI",
@@ -87,6 +87,14 @@
       "lint": 0,
       "format_check": 0,
       "d1_migration_local": "0001_init applied"
+    },
+    "phase4": {
+      "shared_tests": 29,
+      "backend_tests": 100,
+      "admin_tests": 73,
+      "typecheck": 0,
+      "lint": 0,
+      "format_check": 0
     }
   },
   "decisions": [
@@ -105,6 +113,8 @@
     "0": "user approved",
     "1": "user approved",
     "2": "user approved 2026-11-26",
-    "3": "user approved 2026-11-26"
+    "3": "user approved 2026-11-26",
+    "4": "user approved 2026-11-26",
+    "5": "user approved 2026-11-26, to start only after Phase 4 finishes cleanly"
   }
 }

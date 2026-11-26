@@ -5,12 +5,13 @@ import { apiError } from './http/errors';
 import { publicRoutes } from './routes/public';
 import { orderRoutes } from './routes/orders';
 import { imageRoutes } from './routes/images';
+import { adminRoutes } from './admin';
 
 const app = new Hono<AppEnv>();
 
 app.get('/api/health', (c) => c.json({ ok: true }));
 
-// Phase 4 adds app.route('/api/admin', adminRoutes) here.
+app.route('/api/admin', adminRoutes);
 app.route('/', publicRoutes);
 app.route('/', orderRoutes);
 app.route('/', imageRoutes);

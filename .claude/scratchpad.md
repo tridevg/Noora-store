@@ -41,3 +41,10 @@
 - First Phase 2 builder stopped because the state files still said "wait for approval". Re-dispatched after the files were updated.
 - Lesson: when the user approves a phase, update the state files before dispatching subagents, and tell them in the prompt that approval exists.
 - Git identity for commits: Tridev <tridevguha17@gmail.com>, passed per command (see memory git-commit-identity).
+
+## Queued sequence (user instruction)
+1. Finish Phase 4 cleanly: builder adds GET /api/admin/products/:id, GET /api/admin/services, GET /api/admin/services/:id (documented in schema.md "Phase 4 additions"); verifier; commit.
+2. Build Phase 5 (frontend shell, then storefront and admin builders in parallel); verifier; commit.
+3. Smoke-test readiness: `npm run dev` on both 8787 and 5173, D1 seeded, /images/* resolving. Print the local admin credentials and the ssh -L 5173:localhost:5173 command. WAIT for user go-ahead.
+4. Phase 6 (static pages, SEO, a11y, Lighthouse, bundle < 150 KB gz). STOP before Phase 7.
+Open: R17 (_redirects proxy for Phase 7) not approved. Lighthouse needs a Chromium that is not yet installed.

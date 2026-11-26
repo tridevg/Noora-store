@@ -200,6 +200,18 @@ CREATE INDEX idx_bookings_status ON bookings(status);
 
 Order status transitions (enforced server-side): `new` → `confirmed` | `cancelled`; `confirmed` → `delivered` | `cancelled`. `delivered` and `cancelled` are terminal.
 
+### Phase 4 additions
+
+Read routes added so the admin editors have a source for inactive records. Session only (no CSRF), `no-store`, same error envelope.
+
+| Method | Path | Auth | Cache | Request schema | Response (2xx) | Purges public cache |
+|---|---|---|---|---|---|---|
+| GET | `/api/admin/products/:id` | session | `NO_STORE` | none | `200 { product: AdminProductDto }` (includes inactive, variants, images); `404 not_found` | no |
+| GET | `/api/admin/services` | session | `NO_STORE` | none | `200 { services: ServiceDto[] }` (includes inactive, each with `category`) | no |
+| GET | `/api/admin/services/:id` | session | `NO_STORE` | none | `200 { service: ServiceDto }` (includes inactive); `404 not_found` | no |
+
+Response schemas: `AdminProductResponseSchema`, `AdminServicesResponseSchema`, `AdminServiceResponseSchema` in `shared/src/schemas/admin.ts`.
+
 ### Cookies
 
 | Name | HttpOnly | SameSite | Secure | Path | Value |
