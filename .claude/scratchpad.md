@@ -35,3 +35,9 @@
 - Phase 7 default subdomains only; Lighthouse without snap Chromium.
 - Plan trimmed to ~200–250 lines.
 - Phase 1 scaffold, then commit Phase 0 and 1; stop before Phase 2.
+
+## 2026-11-26 — Phase 2 approval and note
+- User approved Phase 2 explicitly. Recorded in manifest.json (phase_approvals) and CLAUDE.md.
+- First Phase 2 builder stopped because the state files still said "wait for approval". Re-dispatched after the files were updated.
+- Lesson: when the user approves a phase, update the state files before dispatching subagents, and tell them in the prompt that approval exists.
+- Git identity for commits: Tridev <tridevguha17@gmail.com>, passed per command (see memory git-commit-identity).

@@ -3,9 +3,9 @@
 Mobile-first e-commerce and services site for a small beauty parlour and ladies' clothing business in India. Target production: 100% Cloudflare Free Tier (Pages, Workers, D1, R2).
 
 ## Status
-- Current phase: **Phase 1** (monorepo scaffold) built and verifying; Phase 0 complete. **Do not start Phase 2 until the user approves.**
+- Current phase: **Phase 2** (shared package), approved by user. Phases 0 and 1 verified and committed (544112d on dev).
 - Node v22.23.5 and npm 10.9.9 installed.
-- Git: local only, no remote. Branch is `master` until the Phase 1 commit, then it is renamed to `dev`.
+- Git: local only, no remote. Working branch is `dev`.
 
 ## Workspace Layout (planned, not yet created)
 - `/frontend` — React + Vite + TypeScript (strict), Tailwind, React Router → Cloudflare Pages

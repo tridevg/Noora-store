@@ -1,3 +1,9 @@
 // @beauty-store/shared: the only export surface (see .claude/architecture.md section 8).
-// Phase 2 adds money.ts, whatsapp.ts, schemas/*.ts and types.ts.
-export {};
+export * from './money';
+export * from './whatsapp';
+export * from './types';
+export * from './schemas/common';
+export * from './schemas/catalogue';
+export * from './schemas/orders';
+export * from './schemas/admin';
+export * from './schemas/uploads';
