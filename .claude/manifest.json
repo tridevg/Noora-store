@@ -34,8 +34,8 @@
       "note": "Lighthouse (user-space Playwright Chromium, mobile): home Perf 86 LCP 2.5s (target 90, <2.5s) FAIL; product Perf 94 LCP 2.4s PASS; A11y 100 and SEO 92 on both. Carried into Phase 7."
     },
     "7": {
-      "name": "Noora card-free deploy (D1 images, Workers, Pages)",
-      "status": "deployed"
+      "name": "Noora card-free deployment (D1 images, Workers, Pages)",
+      "status": "verified"
     }
   },
   "environment": {
@@ -51,7 +51,8 @@
     "disk_free": "45G",
     "chromium": null,
     "blockers": [],
-    "apt_browser_libs_installed": "libnss3, libgbm1, libatk*, libcups2t64, libasound2t64, libxss1 and deps, installed 2026-11-26 10:33 by verifier; kept (full purge would remove plymouth/udisks2)"
+    "apt_browser_libs_installed": "libnss3, libgbm1, libatk*, libcups2t64, libasound2t64, libxss1 and deps, installed 2026-11-26 10:33 by verifier; kept (full purge would remove plymouth/udisks2)",
+    "repository": "git initialised; branch dev; local only, no remote"
   },
   "files_created": [
     "docs/superpowers/specs/2026-11-26-beauty-store-v1-design.md",
@@ -141,6 +142,18 @@
         "a11y": 100,
         "seo": 100
       }
+    },
+    "phase7_final_gates": {
+      "shared": 27,
+      "backend": 120,
+      "frontend": 42,
+      "typecheck": 0,
+      "lint": 0,
+      "format_check": 0,
+      "build": 0,
+      "check_bundle_gzip_bytes": 115062,
+      "limit_bytes": 150000,
+      "note": "secret-pattern scan flagged only a test-only SESSION_SECRET value and a UI 'password' label; both benign"
     }
   },
   "decisions": [
@@ -154,7 +167,8 @@
     "rate_limits(key, attempted_at) replaces login_attempts; POST /api/orders capped 5 per 15 min per IP (deviates from spec table name, approved)",
     "Phase 7: default subdomains; Pages Functions proxy /api, /images, /sitemap.xml, /robots.txt to the Worker; no R2, images in D1 blobs",
     "Lighthouse via user-space Playwright Chromium (chromium.executablePath()); no snap or apt browser installs",
-    "Phase 7 deploy login: wrangler login --device --browser=false; no CLOUDFLARE_API_TOKEN required"
+    "Phase 7 deploy login: wrangler login --device --browser=false; no CLOUDFLARE_API_TOKEN required",
+    "Admin Origin check: a present Origin not in the allowlist gets 403 csrf_failed; an absent Origin passes to CSRF (added Phase 7; allowlist from SITE_URL plus named constants)"
   ],
   "phase_approvals": {
     "0": "user approved",

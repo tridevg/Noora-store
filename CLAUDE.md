@@ -3,7 +3,7 @@
 Mobile-first e-commerce and services site for a small beauty parlour and ladies' clothing business in India. Target production: 100% Cloudflare Free Tier (Pages, Workers, D1).
 
 ## Status
-- Current phase: **Phase 7 deployed** (Noora on Cloudflare free tier). Storefront https://noora-studio.pages.dev, API https://noora-api.tridev-g811.workers.dev. Admin password to be rotated by the user.
+- Current phase: **Phase 7 verified and deployed** (Noora on Cloudflare free tier). Storefront https://noora-studio.pages.dev, API https://noora-api.tridev-g811.workers.dev. Admin password rotation pending (user).
 - Node v22.23.5 and npm 10.9.9 installed.
 - Git: local only, no remote. Working branch is `dev`.
 
