@@ -225,7 +225,16 @@
           "cls": [0.038, 0.038, 0.038]
         }
       },
-      "result": "Preload works (image request starts ~0.5 s, before the JS bundle finishes) but product LCP is unchanged at 2.84 s. Target 1.8 s NOT met. Remaining cost: element render delay about 1.08 s, because the gallery <img> only renders after the JS bundle and GET /api/products/:slug complete. Next lever: deliver the product data with the HTML (Pages Function inlines it, ProductDetailPage consumes it), which needs a frontend/src data-flow change and user approval."
+      "result": "Preload works (image request starts ~0.5 s, before the JS bundle finishes) but product LCP is unchanged at 2.84 s. Target 1.8 s NOT met. Remaining cost: element render delay about 1.08 s, because the gallery <img> only renders after the JS bundle and GET /api/products/:slug complete. Inlining product JSON into the HTML was rejected (see lcp_decision_2026-11-26)."
+    },
+    "lcp_decision_2026-11-26": {
+      "lcp_target_s": 1.8,
+      "lcp_target_status": "waived by user for now",
+      "reason": "Product LCP is limited by the product API waterfall (image renders after GET /api/products/:slug). Inlining product JSON into the Pages Function HTML was rejected: stock and price edits in /admin would require HTML cache invalidation. Product data stays on the single API path with the public s-maxage=300 cache purged by admin mutations.",
+      "baseline_commit": "02b280d",
+      "baseline_deployment": "https://c91b5826.noora-studio.pages.dev",
+      "baseline_build": "index-C__s9c-a",
+      "measured_lighthouse_mobile": {"product_lcp_median_ms": 2841, "product_perf_median": 93, "product_a11y": 100, "product_seo": 100, "home_lcp_median_ms": 889, "home_perf_median": 95}
     }
   },
   "decisions": [
@@ -244,7 +253,8 @@
     "Phase 8: storefront palette Sage & Cream; button fill #5E6D5F (white on #7A8B7B fails AA); hero tiles are CSS gradient placeholders (no image assets)",
     "Phase 8: no variant swatches on product cards (list API carries no variant data); quick add uses GET /api/products/:slug",
     "Phase 8: frontend deploys from frontend/ working directory so Pages Functions bundle (wrangler 4 reads functions/ from cwd); deploy with --branch=main to publish to production, not preview",
-    "Phase 8: nav slug /category/skincare does not exist; closest real slug is skin (unresolved)"
+    "Phase 8: nav slug /category/skincare does not exist; closest real slug is skin (unresolved)",
+    "Product LCP target (< 1.8 s) waived by user 2026-11-26; inline product JSON in HTML rejected (stock/price cache invalidation); baseline 02b280d / c91b5826"
   ],
   "phase_approvals": {
     "0": "user approved",
