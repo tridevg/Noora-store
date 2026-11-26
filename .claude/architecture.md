@@ -107,12 +107,12 @@ Modules:
 Routes are declared in `frontend/src/App.tsx` with `createBrowserRouter`. Every page is `React.lazy()` loaded, so each route is its own chunk. Only the layout and the home route stay in the initial bundle.
 
 ```
-/                       Home (hero, category tiles, featured products, services preview, WhatsApp FAB)
-/products               Catalogue grid with filters, sort, pagination
-/category/:slug         Catalogue filtered by category
-/product/:slug          Product detail (gallery with zoom, size and colour selectors, Add to Cart)
+/                       Home (HeroBentoBanner, CategoryRail, NewArrivalsGrid, services preview when active services exist)
+/products               Catalogue grid with filters, sort, pagination (CatalogView)
+/category/:slug         Catalogue filtered by category (CatalogView)
+/product/:slug          Product detail (ProductGallery, VariantPicker, QuantityStepper, Add to Bag opens the drawer)
 /services               Services grouped by category, "Enquire on WhatsApp"
-/cart                   Cart, customer form (Zod), "Place Order on WhatsApp"
+/cart                   Full-page fallback bag: same checkout as the drawer (useCheckout), "Place Order on WhatsApp"
 /about                  Static
 /contact                Static (map link, phone, WhatsApp)
 /shipping-returns       Static
@@ -127,7 +127,24 @@ Routes are declared in `frontend/src/App.tsx` with `createBrowserRouter`. Every 
 *                       Not found
 ```
 
-Layout: `storefront` layout has the sticky header with debounced search, and a fixed mobile bottom nav (`Home`, `Categories`, `Services`, `Cart`, `WhatsApp`). The admin layout is separate and has no storefront chrome.
+Layout (Phase 8): `StorefrontLayout` wraps the storefront routes in `BagProvider`. It renders `StorefrontHeader` (slender sticky bar: NOORA wordmark, centred nav on desktop, search toggle with debounced search, and a Bag button showing the live item count), `StorefrontFooter`, a fixed mobile `BottomNav` (`md:hidden`; items: `Home` (`/`), `Categories` (`/#categories`), `Services` (`/services`), a Bag button with the live count, and a WhatsApp link when settings have loaded; the slot is kept while they load). The floating `WhatsAppFab` is also rendered, and on phones it is hidden on `/product/*` because the product page has its own buy bar. The header's Bag button and the bottom-nav Bag button both call `openBag()`; they do not navigate to `/cart`. The admin layout is separate and has no storefront chrome.
+
+Route-level code: `/`, `/product/:slug` and the layout are in the entry chunk (`ProductDetailPage` is eager so the gallery LCP image does not wait for a lazy chunk). Other storefront pages are `React.lazy()` chunks. The bag drawer (`CartDrawer`) is a lazy chunk loaded on first open.
+
+## 6a. Cart and bag flow (Phase 8)
+
+- **State:** the cart store stays in `frontend/src/cart/` (`CartContext.tsx`, `reducer.ts`, `lines.ts`), persisted to `localStorage`. Cart edits are client-side only; the server is contacted for product detail (stock and variants) and at order placement.
+- **Open paths:** `BagProvider` (`components/storefront/BagProvider.tsx`) owns an `open` flag and exposes `openBag()` through `useBag()`. Three triggers call it: the header Bag button, the bottom-nav Bag button (`BottomNav.tsx`), and the product card's Add to Bag (`ProductGrid.tsx`). The card's quick add fetches `GET /api/products/<slug>`; a single-variant product adds the line (`quickAddVariant`, `lineForVariant` in `bagActions.ts`) and opens the drawer. The product detail page's Add to Bag also calls `openBag()` after adding the selected variant (`ProductDetailPage.tsx`). Quantity caps come from `stockCap.ts`.
+- **Drawer:** `CartDrawer` is a right-hand `Sheet` (`components/ui/Sheet.tsx`, modal: focus trap, Escape closes, focus returns to the opener). It is mounted only while open, so `BagProvider` unmounts it on close. It holds the lines (`QuantityStepper`), the customer form and the WhatsApp hand-off, and it links to `/cart` as the full-page fallback.
+- **Checkout:** `useCheckout.ts` is the single checkout hook for both the drawer and `/cart`. It validates the form, calls `POST /api/orders` (the server recomputes prices and checks the `order:<ip_hash>` rate limit), then opens the `wa.me` link built by `orderWhatsApp.ts`. The server contract is unchanged from Phase 7.
+- **Stock:** `useCartStock.ts` re-reads `GET /api/products/<slug>` for each cart line to refresh stock and variants. Quantities are capped client-side (`stockCap.ts`). The server remains the authority on price and stock at order time.
+
+## 6b. Storefront blocks and primitives (Phase 8)
+
+- `components/ui/` (shared primitives, no product logic): `Button` (`buttonClass`; variants `primary`, `outline`, `ghost`, `light`; sizes `sm`, `md`, `lg`), `Badge` (tones `discount`, `stock`, `soldOut`, `neutral`), `Select`, `Separator`, `Sheet` (slide-over dialog), `cn` (class joiner).
+- `components/storefront/` (blocks and page-level pieces): `StorefrontHeader`, `StorefrontFooter`, `BagProvider`, `CartDrawer`, `HeroBentoBanner`, `CategoryRail` (categories from `GET /api/categories`), `NewArrivalsGrid` (`GET /api/products?sort=newest`), `ProductGrid` and `ProductCard` (with `ProductGridSkeleton`), `ProductGallery`, `VariantPicker`, `QuantityStepper`, `PriceLabel`, `ServiceCard`, `CatalogView`, `EditorialPage` and `EditorialSection` (shared by the static pages), `Notice`, `icons.tsx`. Data hooks: `useApiResource`, `useSettings`, `useCartStock`, `useCheckout`. Helpers: `catalogQuery.ts`, `checkout.ts`, `errorMessage.ts`, `orderWhatsApp.ts`, `stockCap.ts`, `bagActions.ts`.
+- Pages in `frontend/src/pages/storefront/` compose these blocks. Data access (verified): `HomePage` reads `/api/settings` (`useSettings`, hero headline) and `/api/services`, and composes `HeroBentoBanner`, `CategoryRail` (`/api/categories`) and `NewArrivalsGrid` (`/api/products?sort=newest`); `CatalogView` (products and category pages) reads `/api/products` and `/api/categories`; `ProductDetailPage` reads `/api/products/:slug`; `ServicesPage` reads `/api/services`; `ContactPage` reads `/api/settings`; cart lines are refreshed through `useCartStock`, called from `useCheckout`, which both `CartDrawer` and `/cart` use; `ProductGrid` quick add calls `GET /api/products/:slug`.
+- Component tests live in `components/storefront/__tests__/` (`bagActions.test.ts`). No DOM snapshot tests.
 
 Module layout:
 
@@ -135,22 +152,40 @@ Module layout:
 frontend/src/
   App.tsx                 route table (shell-owned)
   main.tsx
-  styles/tokens.css       design tokens (shell-owned)
+  index.css               design tokens and Tailwind @theme (Phase 8; replaces styles/tokens.css)
   i18n/en.ts              English strings (shell-owned); hi.ts added later
   i18n/index.ts           t(key) helper
   lib/api.ts              typed fetch wrapper for /api/*
-  lib/money.ts            re-export of shared formatPaise
-  lib/webp.ts             WebP pipeline (admin track)
-  components/ui/          shared primitives (shell-owned)
-  components/layout/      storefront header, bottom nav, WhatsApp FAB (storefront track)
-  cart/                   cart store and Cart page logic (storefront track)
-  storefront/             page components (storefront track)
-  admin/                  admin pages and components (admin track)
+  components/ui/          shared primitives: Button, Badge, Select, Separator, Sheet, cn
+  components/layout/      StorefrontLayout, BottomNav, WhatsAppFab, useDocumentMeta, seo, focus-trap and hooks
+  components/storefront/  Phase 8 storefront blocks, BagProvider, CartDrawer, checkout hooks, helpers
+  components/admin/       admin UI, uploader and image pipeline (imagePipeline.ts, uploadImage.ts)
+  cart/                   cart store (CartContext, reducer, lines); shared by drawer and /cart
+  pages/storefront/       route components for the storefront
+  pages/admin/            route components for the admin
 ```
+
+Note: `lib/webp.ts` and `lib/money.ts` do not exist. The admin image pipeline is `components/admin/imagePipeline.ts`, and money formatting comes from `@beauty-store/shared`.
 
 ## 7. Design tokens and i18n
 
-- `frontend/src/styles/tokens.css` defines CSS custom properties on `:root`: colour (accent plus neutrals), type scale, spacing, radius (rounded product cards), shadow. Tailwind v4 reads them through `@theme`. Components use token-backed utility classes only, with no raw hex values.
+Token file: `frontend/src/index.css` (Phase 8; `styles/tokens.css` was removed). It imports Tailwind v4 with `@import 'tailwindcss'`, and defines two sets of CSS custom properties.
+
+**Admin set (`--bs-*`, on `:root`):** `--bs-accent` `#9d174d`, `--bs-surface` `#fffaf8`, `--bs-ink`, `--bs-muted`, `--bs-border` `#8a7f85`, `--bs-danger`, `--bs-font-sans`, `--bs-radius-card`, `--bs-radius-pill`, `--bs-shadow-card`. The admin keeps this set, so its look did not change in Phase 8.
+
+**Storefront set (`--bg-*`, `--accent-*`, `--ink-*`, `--border-subtle`, `--drawer-*`):** the "Modern Minimal Sage & Cream" palette. Key values: canvas `#fdfbf7`, sand `#f3ede4`, sage `#7a8b7b` (fills and text on sage use `#5e6d5f` hover and `#4d5b4e` pressed, because white on `#7a8b7b` is below 4.5:1), tint `#e4eae3`, ink `#2d312e` and muted ink `#5a605b`, border `#e8e3da`, dark drawer `#1e221f` with surface `#2a2f2b`.
+
+**Tailwind mapping (`@theme`):** the admin tokens map to `--color-accent`, `--color-surface`, `--color-ink`, `--color-muted`, `--color-border`, `--color-danger`, `--font-sans`, `--radius-card`, `--radius-pill`, `--shadow-card`, and the type scale `--text-display`, `--text-heading`, `--text-body`, `--text-small`. The storefront set maps to `--color-canvas`, `--color-sand`, `--color-sage` (plus `-hover`, `-pressed`, `-tint`), `--color-ink-primary`, `--color-ink-muted`, `--color-border-subtle`, `--color-drawer-*`, `--font-display` and `--font-ui`. Utilities such as `bg-sage`, `text-ink-muted`, `border-border-subtle`, `bg-drawer-dark`, `font-display` and `font-ui` come from these. The `tile-sage` and `tile-sand` utilities (`@utility`) hold the only raw hex values, as CSS gradients for placeholder tiles, so no image requests are made.
+
+Rule: components use token-backed utility classes, not raw hex. The gradient utilities above are the exception.
+
+Note: `--bs-font-sans` (used by the admin and `body`) names `Inter`. `index.html` does not load Inter, so admin text falls back to the system stack. The storefront root `div` in `StorefrontLayout` uses `font-ui` (Plus Jakarta Sans) and headings use `font-display` (Cormorant Garamond).
+
+**Font loading (Phase 8, `frontend/index.html`):** Cormorant Garamond (weights 500, 600; display) and Plus Jakarta Sans (weights 400 to 700; UI) come from Google Fonts. The file has `preconnect` links to `fonts.googleapis.com` and `fonts.gstatic.com` (crossorigin). The stylesheet is loaded with `media="print"` and switches to `all` in `onload`, so it does not block first paint. A `<noscript>` fallback link is included. The URL uses `display=swap`, so system fallback text shows while the fonts load. Fallback faces (`Cormorant Garamond Fallback`, `Plus Jakarta Sans Fallback`) are metric-tuned in `index.css` to reduce layout shift; tuned on Linux, not yet checked on a real phone. Fonts are not self-hosted; Google Fonts is a third-party dependency.
+
+A global `:focus-visible` outline (3 px, `var(--bs-accent)`, 2 px offset) is in `index.html`'s `<style>` block.
+
+- Components use the `--bs-*` and storefront utilities above. No component uses hard-coded hex (except the `tile-sage`/`tile-sand` gradients).
 - Text lives in `frontend/src/i18n/en.ts`. The file exports a const object and `type Messages = typeof en`. `i18n/index.ts` exposes `t(key: keyof Messages)`. Components never hold English strings directly.
 - Adding Hindi means adding `hi.ts` with the same shape. No component changes.
 
@@ -177,3 +212,10 @@ Backend and frontend import `@beauty-store/shared` as TypeScript source through 
 - Initial JS gzip: 134,547 bytes (limit 150,000). Every route is React.lazy; only StorefrontLayout and CartProvider are eager.
 - Storefront: /, /products, /category/:slug, /product/:slug, /services, /cart. Admin: /admin/login and the dashboard, products, products/:id, services, orders, and settings routes.
 - Known gaps: About, Contact, Shipping, Privacy and NotFound are still placeholders (Phase 6). Stock is not enforced at add-to-cart or checkout. There are no image reorder or alt-text endpoints. Categories and settings in the admin are read from the public GET endpoints.
+
+## Phase 8 status (storefront reskin, 2026-11-26)
+- Storefront restyled to "Modern Minimal Sage & Cream" with modular blocks (sections 6a, 6b, 7). Admin styling unchanged.
+- No change to the request/cache flow, proxy topology, auth/CSRF, D1 schema or `/api/*` contracts. See `.claude/schema.md` Phase 8 note.
+- Verified (2026-11-26): bottom-nav items and page data access as described above; initial bundle 118,836 bytes gzip (limit 150,000). Deployed: production build `index-BTEby1bs`, final deployment https://3e75dd7b.noora-studio.pages.dev. Deploy from `frontend/` so the Pages Functions bundle is included.
+- Known gap: product page LCP audit 2.8 s (Phase 7 measured 1.81 s). Perf 91-92 still meets the 90 target. Next lever: preload the product API.
+- Deviations: no variant swatches on product cards (list API has no variant data); nav link `/category/skincare` has no matching category (closest is `skin`); button fill `#5E6D5F` for AA contrast; hero tiles are CSS placeholders.

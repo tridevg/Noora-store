@@ -17,6 +17,27 @@ No app code exists yet. Phase 1 starts only after Node 22 is installed and the u
 
 ---
 
+## Phase 8 close-out (2026-11-26): storefront reskin
+
+Frontend only; no schema, migration, `/api/*` or backend change. User approved; deployed to https://noora-studio.pages.dev (final deployment https://3e75dd7b.noora-studio.pages.dev, build `index-BTEby1bs`). Shipped design:
+
+- **Tokens:** "Modern Minimal Sage & Cream" in `frontend/src/index.css` (replaces `styles/tokens.css`). Admin `--bs-*` set unchanged. Sage accent with `#5E6D5F` fill for buttons (white on `#7A8B7B` fails AA).
+- **Blocks:** slender sticky header, `HeroBentoBanner` (CSS gradient placeholder tiles, no image assets), `CategoryRail`, `NewArrivalsGrid`, product grid and card, footer, fixed mobile bottom nav with live Bag count.
+- **Bag drawer:** right-hand sheet (`CartDrawer` on `ui/Sheet`) opened from the header, bottom nav and Add to Bag. Checkout shared with `/cart` via `useCheckout`; server still recomputes prices and enforces `order:<ip_hash>`.
+- **Fonts:** Cormorant Garamond (display) and Plus Jakarta Sans (UI) from Google Fonts with `display=swap`, non-blocking stylesheet load, metric-tuned fallbacks. Not self-hosted.
+- **Product page:** `ProductDetailPage` in the entry chunk; skeleton sizing and a stable bottom-nav slot to limit CLS.
+
+Deviations from the original checklist:
+- No variant swatches on product cards: the list API carries no variant data. Quick add fetches the product detail.
+- Nav link `/category/skincare` has no matching category; closest real slug is `skin`. Unresolved.
+- Hero tiles are CSS placeholders (approved), not photography.
+
+Verification: typecheck, lint, format:check, `npm test` 27/120/47, build, bundle 118,836 bytes gzip (limit 150,000). Lighthouse mobile: home Perf 94-98, A11y 100, SEO 100; product Perf 91-92, A11y 100, SEO 100. Product LCP audit 2.8 s (Phase 7 measured 1.81 s): open item, next lever is a product API preload.
+
+Deploy: run from `frontend/` with `--branch=main` so the Pages Functions bundle is included and the deploy goes to production (see CLAUDE.md).
+
+---
+
 Hard limits (paise, 10 ms Worker CPU, 150,000-byte bundle, Lighthouse ≥ 90) live in `CLAUDE.md` and architecture.md; this plan does not repeat them.
 
 ## Resolutions

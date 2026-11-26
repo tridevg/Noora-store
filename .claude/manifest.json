@@ -2,7 +2,7 @@
   "project": "beauty-fashion-store",
   "spec": "docs/superpowers/specs/2026-11-26-beauty-store-v1-design.md",
   "plan": "docs/superpowers/plans/implementation-plan.md",
-  "current_phase": 7,
+  "current_phase": 8,
   "phases": {
     "0": {
       "name": "EC2 env check, bootstrap, planning, state init",
@@ -36,6 +36,11 @@
     "7": {
       "name": "Noora card-free deployment (D1 images, Workers, Pages)",
       "status": "signed_off"
+    },
+    "8": {
+      "name": "Storefront reskin: Sage & Cream tokens, modular blocks",
+      "status": "verified",
+      "note": "Frontend only. Deployed to production (build index-BTEby1bs, final deployment 3e75dd7b). Known gap: product page LCP audit 2.8 s (Phase 7 was 1.81 s); the gallery image waits for the JS chunk and the product API. Lever not yet pulled: preload the product API. Perf 91-92 on product still meets the 90 target."
     }
   },
   "environment": {
@@ -159,6 +164,31 @@
       "check_bundle_gzip_bytes": 115062,
       "limit_bytes": 150000,
       "note": "secret-pattern scan flagged only a test-only SESSION_SECRET value and a UI 'password' label; both benign"
+    },
+    "phase8": {
+      "shared": 27,
+      "backend": 120,
+      "frontend": 47,
+      "typecheck": 0,
+      "lint": 0,
+      "format_check": 0,
+      "build": 0,
+      "check_bundle_gzip_bytes": 118836,
+      "limit_bytes": 150000,
+      "lighthouse_home_mobile": {
+        "perf": "94-98",
+        "a11y": 100,
+        "seo": 100
+      },
+      "lighthouse_product_mobile": {
+        "url": "/product/oxidised-jhumka-earrings",
+        "perf": "91-92",
+        "a11y": 100,
+        "seo": 100,
+        "lcp_s": 2.8,
+        "lcp_note": "audit still 2.8 s; gallery image waits for JS chunk and product API"
+      },
+      "note": "Gates: npm test 27/120/47 (shared/backend/frontend)."
     }
   },
   "decisions": [
@@ -173,7 +203,11 @@
     "Phase 7: default subdomains; Pages Functions proxy /api, /images, /sitemap.xml, /robots.txt to the Worker; no R2, images in D1 blobs",
     "Lighthouse via user-space Playwright Chromium (chromium.executablePath()); no snap or apt browser installs",
     "Phase 7 deploy login: wrangler login --device --browser=false; no CLOUDFLARE_API_TOKEN required",
-    "Admin Origin check: a present Origin not in the allowlist gets 403 csrf_failed; an absent Origin passes to CSRF (added Phase 7; allowlist from SITE_URL plus named constants)"
+    "Admin Origin check: a present Origin not in the allowlist gets 403 csrf_failed; an absent Origin passes to CSRF (added Phase 7; allowlist from SITE_URL plus named constants)",
+    "Phase 8: storefront palette Sage & Cream; button fill #5E6D5F (white on #7A8B7B fails AA); hero tiles are CSS gradient placeholders (no image assets)",
+    "Phase 8: no variant swatches on product cards (list API carries no variant data); quick add uses GET /api/products/:slug",
+    "Phase 8: frontend deploys from frontend/ working directory so Pages Functions bundle (wrangler 4 reads functions/ from cwd); deploy with --branch=main to publish to production, not preview",
+    "Phase 8: nav slug /category/skincare does not exist; closest real slug is skin (unresolved)"
   ],
   "phase_approvals": {
     "0": "user approved",
@@ -183,7 +217,8 @@
     "4": "user approved 2026-11-26",
     "5": "user approved 2026-11-26",
     "6": "user approved 2026-11-26",
-    "7": "user approved 2026-11-26"
+    "7": "user approved 2026-11-26",
+    "8": "user approved 2026-11-26 (storefront reskin, placeholders for hero tiles, subagent-driven); verified and deployed 2026-11-26"
   },
   "deployment": {
     "worker": "https://noora-api.tridev-g811.workers.dev",
@@ -198,7 +233,10 @@
     "admin_credentials_file": "deleted by user",
     "worker_secrets": [
       "SESSION_SECRET"
-    ]
+    ],
+    "production_build": "index-BTEby1bs",
+    "phase8_final_deployment": "https://3e75dd7b.noora-studio.pages.dev",
+    "frontend_deploy_command": "cd frontend && npx wrangler pages deploy dist --project-name=noora-studio --branch=main"
   },
   "signoff": {
     "phase_7": "signed off by user",
@@ -211,16 +249,16 @@
     "user_actions_pending": [
       "rotate admin password via /admin"
     ],
-    "phase_8": "not needed now"
+    "phase_8": "approved and deployed 2026-11-26 (final deployment 3e75dd7b)"
   },
   "docs_status": {
-    "CLAUDE.md": "synced 2026-11-26",
-    "architecture.md": "synced",
-    "schema.md": "synced (Phase 7 additions)",
-    "endpoints.txt": "added 2026-11-26",
-    "implementation-plan.md": "close-out banner added; checklist kept as original",
-    "scratchpad.md": "final entry added",
-    "README.md": "deploy section and test note updated"
+    "CLAUDE.md": "synced 2026-11-26 (Phase 8 deployed; deploy from frontend/)",
+    "architecture.md": "synced (Phase 8 sections verified against code)",
+    "schema.md": "synced (Phase 8 note: no schema change)",
+    "endpoints.txt": "deploy section updated for frontend/ Functions bundle",
+    "implementation-plan.md": "close-out banner kept; Phase 8 section added",
+    "scratchpad.md": "Phase 8 entry added",
+    "README.md": "deploy section updated"
   },
   "last_commit_docs": "d3e4859"
 }

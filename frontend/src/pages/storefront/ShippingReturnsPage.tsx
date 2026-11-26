@@ -10,16 +10,16 @@ export default function ShippingReturnsPage() {
       lead={t('staticPages.shipping.lead')}
     >
       <EditorialSection id="shipping-delivery" heading={t('staticPages.shipping.deliveryHeading')}>
-        <p className="text-body text-ink">{t('staticPages.shipping.deliveryBody')}</p>
+        <p className="text-body text-ink-primary">{t('staticPages.shipping.deliveryBody')}</p>
       </EditorialSection>
       <EditorialSection id="shipping-payment" heading={t('staticPages.shipping.paymentHeading')}>
-        <p className="text-body text-ink">{t('staticPages.shipping.paymentBody')}</p>
+        <p className="text-body text-ink-primary">{t('staticPages.shipping.paymentBody')}</p>
       </EditorialSection>
       <EditorialSection id="shipping-returns" heading={t('staticPages.shipping.returnsHeading')}>
-        <p className="text-body text-ink">{t('staticPages.shipping.returnsBody')}</p>
+        <p className="text-body text-ink-primary">{t('staticPages.shipping.returnsBody')}</p>
       </EditorialSection>
       <EditorialSection id="shipping-questions" heading={t('staticPages.shipping.contactHeading')}>
-        <p className="text-body text-muted">{t('staticPages.shipping.contactBody')}</p>
+        <p className="text-body text-ink-muted">{t('staticPages.shipping.contactBody')}</p>
       </EditorialSection>
     </EditorialPage>
   );

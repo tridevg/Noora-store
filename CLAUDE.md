@@ -3,7 +3,7 @@
 Mobile-first e-commerce and services site for a small beauty parlour and ladies' clothing business in India. Target production: 100% Cloudflare Free Tier (Pages, Workers, D1).
 
 ## Status
-- Current phase: **Phase 7 signed off** (Noora live). No further phases planned. Admin password rotation is the user's action.
+- Current phase: **Phase 8 deployed** (storefront reskin, Sage & Cream; final deployment https://3e75dd7b.noora-studio.pages.dev). Phase 7 signed off. Admin password rotation is the user's action.
 - Node v22.23.5 and npm 10.9.9 installed.
 - Git: remote `origin` = https://github.com/tridevg/Noora-store.git. Working branch `dev` (tracks origin/dev).
 
@@ -40,7 +40,7 @@ Mobile-first e-commerce and services site for a small beauty parlour and ladies'
 - Dev: `npx wrangler dev` (backend, 127.0.0.1:8787) and `npm run dev -w frontend` (Vite, 127.0.0.1:5173)
 - Test: `npm test` (Vitest + Miniflare)
 - Typecheck: `npx tsc --noEmit -p <workspace>`
-- Deploy: `npx wrangler login --device --browser=false` once, then `npx wrangler deploy` (backend) and `npx wrangler pages deploy frontend/dist --project-name=noora-studio` (frontend). No `CLOUDFLARE_API_TOKEN` needed. Default `*.pages.dev` and `*.workers.dev` subdomains.
+- Deploy: `npx wrangler login --device --browser=false` once, then `npx wrangler deploy` (backend) and `cd frontend && npx wrangler pages deploy dist --project-name=noora-studio --branch=main` (frontend). Deploy the frontend from the `frontend/` working directory so the Pages Functions bundle (`frontend/functions/`) is included; deploying from the repo root omits it. `--branch=main` publishes to production (without it a git branch deploy is only a preview). No `CLOUDFLARE_API_TOKEN` needed. Default `*.pages.dev` and `*.workers.dev` subdomains.
 - Browser audit: `npm run audit:lighthouse` (user-space Playwright Chromium via `chromium.executablePath()`; no apt browser installs)
 - Live URLs: storefront https://noora-studio.pages.dev; API https://noora-api.tridev-g811.workers.dev
 

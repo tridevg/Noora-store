@@ -7,10 +7,12 @@ import { t } from './i18n';
 import { apiGet } from './lib/api';
 // Home is in the entry chunk: its hero is the LCP element, so it must not wait for a second chunk.
 import HomePage from './pages/storefront/HomePage';
+// Product detail is in the entry chunk too: its gallery image is the LCP element, and a lazy chunk
+// would show the route fallback (a short shift) before the skeleton and delay the image request.
+import ProductDetailPage from './pages/storefront/ProductDetailPage';
 
 const ProductsPage = lazy(() => import('./pages/storefront/ProductsPage'));
 const CategoryPage = lazy(() => import('./pages/storefront/CategoryPage'));
-const ProductDetailPage = lazy(() => import('./pages/storefront/ProductDetailPage'));
 const ServicesPage = lazy(() => import('./pages/storefront/ServicesPage'));
 const CartPage = lazy(() => import('./pages/storefront/CartPage'));
 const AboutPage = lazy(() => import('./pages/storefront/AboutPage'));
@@ -62,7 +64,7 @@ export const routes: RouteObject[] = [
       { index: true, element: <HomePage /> },
       { path: 'products', element: page(ProductsPage) },
       { path: 'category/:slug', element: page(CategoryPage) },
-      { path: 'product/:slug', element: page(ProductDetailPage) },
+      { path: 'product/:slug', element: <ProductDetailPage /> },
       { path: 'services', element: page(ServicesPage) },
       { path: 'cart', element: page(CartPage) },
       { path: 'about', element: page(AboutPage) },

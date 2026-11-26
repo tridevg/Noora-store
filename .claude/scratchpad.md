@@ -79,3 +79,28 @@ Open: R17 (_redirects proxy for Phase 7) not approved. Lighthouse needs a Chromi
 - Apt browser-support libs kept. Playwright Chromium in user space.
 - Docs synced: CLAUDE.md, manifest.json, plan close-out banner, README, endpoints.txt, scratchpad.
 - Open for user: git remote (none); npm audit (6 high) triage; remove or keep apt libs (decided: keep).
+
+
+## Phase 8 approved (2026-11-26)
+- Scope: public storefront reskin (frontend only). Tokens per brief (Sage & Cream); Vite stays; template /tmp/storefront-template is reference only and must be removed before commit.
+- Hero tiles: abstract CSS placeholders (no new image assets).
+- Backend, D1, /admin, Origin/CSRF unchanged. Initial JS < 150,000 bytes gzip.
+- Execution: subagents build; coordinator updates state files.
+
+
+## 2026-11-26 — Phase 8 verified and deployed
+- Approval: user approved Phase 8 (storefront reskin, frontend only, CSS placeholders for hero tiles, subagent-driven). Approval recorded in manifest.phase_approvals before builders ran.
+- Builder work: Sage & Cream tokens in `frontend/src/index.css` (replaces `styles/tokens.css`); `components/ui/` primitives; storefront blocks (`HeroBentoBanner`, `CategoryRail`, `NewArrivalsGrid`, header, footer, bottom nav with live Bag count); bag drawer (`BagProvider`, `CartDrawer`, `useCheckout`, `useCartStock`); `/cart` kept as fallback. No backend, D1 or `/api/*` change.
+- Gates: typecheck, lint, format:check, `npm test` 27/120/47 (shared/backend/frontend), build, check:bundle 118,836 bytes gzip (limit 150,000).
+- Lighthouse mobile (live build): home Perf 94-98, A11y 100, SEO 100. Product `/product/oxidised-jhumka-earrings` Perf 91-92, A11y 100, SEO 100.
+- Deploy incident 1: first deploy from git branch `dev` produced only a preview. Redeployed with `--branch=main`.
+- Deploy incident 2: second deploy ran from repo root, which omitted `frontend/functions`, so `/api/*` and `robots.txt` served HTML. Fixed by deploying from the `frontend/` working directory (wrangler 4 reads `functions/` from cwd).
+- Final deploy: production build `index-BTEby1bs`, deployment https://3e75dd7b.noora-studio.pages.dev.
+- Product page CLS fixed: eager `ProductDetailPage` route, skeleton sizing, font fallbacks tuned, BottomNav slot kept stable while settings load.
+- Open items:
+  - Product LCP audit 2.8 s (Phase 7 was 1.81 s). Gallery image waits for the JS chunk and the product API. Remaining lever: preload the product API. Not done.
+  - Nav link `/category/skincare` does not exist. Closest real slug is `skin`. Not changed (no source edits in this phase close-out).
+  - Fallback font metrics tuned on Linux; needs a real-phone check.
+  - Inter is named in `--bs-font-sans` but not loaded. Body text uses the system stack.
+  - Google Fonts is a third-party dependency (Cormorant Garamond, Plus Jakarta Sans). Not self-hosted.
+  - Button fill `#5E6D5F` chosen for AA contrast (white on `#7A8B7B` fails).

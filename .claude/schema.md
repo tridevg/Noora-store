@@ -297,5 +297,10 @@ Errors: `400 validation_failed` (missing or non-image part, empty part, bad fiel
 - `ADMIN_PASSWORD_HASH` is read only by the seed script. The Worker logs in against the `admin_users` row, so the secret is set for provisioning parity but the Worker does not read it.
 - `SITE_URL` is not set yet. The Pages origin is not known at deploy time.
 
+### Phase 8 note (2026-11-26, storefront reskin)
+- The Sage & Cream storefront reskin changes **no** D1 schema, migrations, or `/api/*` Zod contracts. The changes are frontend only (`frontend/`: CSS tokens, components, cart drawer, font loading).
+- DDL confirmed unaltered: `backend/migrations/0001_init.sql` and `backend/migrations/0002_image_blobs.sql` have no uncommitted changes, and `git diff HEAD -- backend shared` is empty. No migration was added.
+- Endpoints used by the storefront are unchanged: `GET /api/products` (incl. `sort=newest`), `GET /api/products/:slug`, `GET /api/categories`, `GET /api/services`, `GET /api/settings`, and `POST /api/orders` (the order is still placed, then the browser opens `wa.me`).
+
 ## Additional route (Phase 3 audit)
 - `GET /api/health` — returns `{"ok": true}`. Not part of the public contract table; used for smoke checks only.

@@ -47,7 +47,9 @@ export function VariantPicker({ variants, value, onChange }: VariantPickerProps)
   return (
     <div className="space-y-4">
       <fieldset className="space-y-2">
-        <legend className="text-small font-medium text-ink">{t('storefront.product.size')}</legend>
+        <legend className="text-small font-medium text-ink-primary">
+          {t('storefront.product.size')}
+        </legend>
         <div className="flex flex-wrap gap-2">
           {sizes.map((size) => {
             const available = variants.some((v) => v.size === size);
@@ -61,8 +63,8 @@ export function VariantPicker({ variants, value, onChange }: VariantPickerProps)
                 onClick={() => chooseSize(size)}
                 className={`min-h-11 min-w-11 rounded-pill border px-4 text-small ${
                   active
-                    ? 'border-accent bg-accent text-accent-ink'
-                    : 'border-border bg-surface-raised text-ink'
+                    ? 'border-sage-hover bg-sage-hover text-white'
+                    : 'border-border-subtle bg-canvas text-ink-primary'
                 } disabled:opacity-40`}
               >
                 {size}
@@ -73,7 +75,7 @@ export function VariantPicker({ variants, value, onChange }: VariantPickerProps)
       </fieldset>
 
       <fieldset className="space-y-2">
-        <legend className="text-small font-medium text-ink">
+        <legend className="text-small font-medium text-ink-primary">
           {t('storefront.product.colour')}
         </legend>
         <div className="flex flex-wrap gap-2">
@@ -89,8 +91,8 @@ export function VariantPicker({ variants, value, onChange }: VariantPickerProps)
                 onClick={() => chooseColour(colour)}
                 className={`min-h-11 rounded-pill border px-4 text-small ${
                   active
-                    ? 'border-accent bg-accent text-accent-ink'
-                    : 'border-border bg-surface-raised text-ink'
+                    ? 'border-sage-hover bg-sage-hover text-white'
+                    : 'border-border-subtle bg-canvas text-ink-primary'
                 } disabled:opacity-40`}
               >
                 {colour}
@@ -108,7 +110,7 @@ export function VariantPicker({ variants, value, onChange }: VariantPickerProps)
 function StockLine({ variant }: { variant: VariantDto | undefined }) {
   if (!variant) {
     return (
-      <p role="status" className="text-small text-muted">
+      <p role="status" className="text-small text-ink-muted">
         {t('storefront.product.unavailable')}
       </p>
     );
@@ -122,7 +124,10 @@ function StockLine({ variant }: { variant: VariantDto | undefined }) {
   }
   const low = variant.stock <= LOW_STOCK_THRESHOLD;
   return (
-    <p role="status" className={`text-small font-medium ${low ? 'text-accent' : 'text-ink'}`}>
+    <p
+      role="status"
+      className={`text-small font-medium ${low ? 'text-sage-hover' : 'text-ink-primary'}`}
+    >
       {low
         ? fill(t('storefront.product.lowStock'), { count: variant.stock })
         : t('storefront.product.inStock')}

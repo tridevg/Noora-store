@@ -11,44 +11,44 @@ export default function AboutPage() {
       lead={t('staticPages.about.lead')}
     >
       <EditorialSection id="about-story" heading={t('staticPages.about.storyHeading')}>
-        <p className="text-body text-ink">{t('staticPages.about.storyBody')}</p>
+        <p className="text-body text-ink-primary">{t('staticPages.about.storyBody')}</p>
       </EditorialSection>
 
       <EditorialSection id="about-values" heading={t('staticPages.about.valuesHeading')}>
         <ul className="grid gap-4 sm:grid-cols-3">
-          <li className="space-y-2 rounded-card bg-surface-raised p-4 shadow-card">
-            <h3 className="font-semibold text-ink">{t('staticPages.about.value1Title')}</h3>
-            <p className="text-small text-muted">{t('staticPages.about.value1Body')}</p>
+          <li className="space-y-2 rounded-[1.25rem] bg-sand p-4">
+            <h3 className="font-semibold text-ink-primary">{t('staticPages.about.value1Title')}</h3>
+            <p className="text-small text-ink-muted">{t('staticPages.about.value1Body')}</p>
           </li>
-          <li className="space-y-2 rounded-card bg-surface-raised p-4 shadow-card">
-            <h3 className="font-semibold text-ink">{t('staticPages.about.value2Title')}</h3>
-            <p className="text-small text-muted">{t('staticPages.about.value2Body')}</p>
+          <li className="space-y-2 rounded-[1.25rem] bg-sand p-4">
+            <h3 className="font-semibold text-ink-primary">{t('staticPages.about.value2Title')}</h3>
+            <p className="text-small text-ink-muted">{t('staticPages.about.value2Body')}</p>
           </li>
-          <li className="space-y-2 rounded-card bg-surface-raised p-4 shadow-card">
-            <h3 className="font-semibold text-ink">{t('staticPages.about.value3Title')}</h3>
-            <p className="text-small text-muted">{t('staticPages.about.value3Body')}</p>
+          <li className="space-y-2 rounded-[1.25rem] bg-sand p-4">
+            <h3 className="font-semibold text-ink-primary">{t('staticPages.about.value3Title')}</h3>
+            <p className="text-small text-ink-muted">{t('staticPages.about.value3Body')}</p>
           </li>
         </ul>
       </EditorialSection>
 
-      <section
-        aria-labelledby="about-cta"
-        className="space-y-4 rounded-card bg-surface-raised p-6 shadow-card"
-      >
-        <h2 id="about-cta" className="text-heading font-semibold text-ink">
+      <section aria-labelledby="about-cta" className="space-y-4 rounded-[1.25rem] bg-sand p-6">
+        <h2
+          id="about-cta"
+          className="font-display text-[1.6rem] leading-tight font-medium text-ink-primary"
+        >
           {t('staticPages.about.ctaHeading')}
         </h2>
-        <p className="text-body text-muted">{t('staticPages.about.ctaBody')}</p>
+        <p className="text-body text-ink-muted">{t('staticPages.about.ctaBody')}</p>
         <div className="flex flex-wrap gap-3">
           <Link
             to="/products"
-            className="inline-flex min-h-12 items-center rounded-pill bg-accent px-6 font-semibold text-accent-ink"
+            className="inline-flex min-h-12 items-center rounded-pill bg-sage-hover px-6 font-semibold text-white"
           >
             {t('staticPages.about.ctaShop')}
           </Link>
           <Link
             to="/contact"
-            className="inline-flex min-h-12 items-center rounded-pill border border-border px-6 font-semibold text-ink"
+            className="inline-flex min-h-12 items-center rounded-pill border border-border-subtle px-6 font-semibold text-ink-primary"
           >
             {t('staticPages.about.ctaContact')}
           </Link>

@@ -28,7 +28,7 @@ function groupByCategory(services: readonly ServiceDto[]): ServiceGroup[] {
   return [...groups.values()];
 }
 
-/** /services: services grouped by category, each with duration, price and "Enquire on WhatsApp". */
+/** /services: services grouped by category, each with duration, price and"Enquire on WhatsApp". */
 export default function ServicesPage() {
   const settings = useSettings();
   const { data, error, loading, reload } = useApiResource<{ services: ServiceDto[] }>(
@@ -38,14 +38,17 @@ export default function ServicesPage() {
   return (
     <section className="space-y-8 py-2" aria-labelledby="services-title">
       <header className="space-y-2">
-        <h1 id="services-title" className="text-display font-semibold text-ink">
+        <h1
+          id="services-title"
+          className="font-display text-[2.6rem] leading-[1.05] font-medium text-ink-primary text-ink-primary"
+        >
           {t('storefront.services.title')}
         </h1>
-        <p className="text-body text-muted">{t('storefront.services.intro')}</p>
+        <p className="text-body text-ink-muted">{t('storefront.services.intro')}</p>
       </header>
 
       {loading ? (
-        <p role="status" className="text-muted">
+        <p role="status" className="text-ink-muted">
           {t('common.loading')}
         </p>
       ) : error ? (
@@ -55,7 +58,9 @@ export default function ServicesPage() {
       ) : data && data.services.length > 0 ? (
         groupByCategory(data.services).map((group) => (
           <div key={group.slug} className="space-y-4">
-            <h2 className="text-heading font-semibold text-ink">{group.name}</h2>
+            <h2 className="font-display text-[1.6rem] leading-tight font-medium text-ink-primary">
+              {group.name}
+            </h2>
             <div className="grid gap-4 md:grid-cols-2">
               {group.services.map((service) => (
                 <ServiceCard key={service.id} service={service} settings={settings} />

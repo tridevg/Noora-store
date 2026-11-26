@@ -14,14 +14,16 @@ export function PriceLabel({ mrpPaise, pricePaise, size = 'card' }: PriceLabelPr
   const onSale = mrpPaise > pricePaise;
   return (
     <p
-      className={`flex flex-wrap items-baseline gap-x-2 ${size === 'detail' ? 'text-heading' : 'text-small'}`}
+      className={`flex flex-wrap items-baseline gap-x-2 font-ui ${
+        size === 'detail' ? 'text-heading' : 'text-small'
+      }`}
     >
-      <span className="font-semibold text-ink">{formatPaise(pricePaise)}</span>
+      <span className="font-semibold text-ink-primary">{formatPaise(pricePaise)}</span>
       {onSale ? (
         <>
           <span className="sr-only">{t('storefront.product.mrp')}</span>
-          <s className="text-muted">{formatPaise(mrpPaise)}</s>
-          <span className="font-medium text-accent">
+          <s className="text-ink-muted">{formatPaise(mrpPaise)}</s>
+          <span className="font-semibold text-sage-hover">
             {fill(t('storefront.card.percentOff'), { percent: off })}
           </span>
         </>

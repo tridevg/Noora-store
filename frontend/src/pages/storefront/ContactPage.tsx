@@ -42,7 +42,7 @@ export default function ContactPage() {
       lead={t('staticPages.contact.lead')}
     >
       {loading ? (
-        <p role="status" className="text-body text-muted">
+        <p role="status" className="text-body text-ink-muted">
           {t('staticPages.contact.loading')}
         </p>
       ) : null}
@@ -71,12 +71,12 @@ function ContactDetails({ settings }: { settings: SettingsMap }) {
             target="_blank"
             rel="noopener noreferrer"
             aria-label={t('whatsapp.fabLabel')}
-            className="inline-flex min-h-12 items-center rounded-pill bg-accent px-6 font-semibold text-accent-ink"
+            className="inline-flex min-h-12 items-center rounded-pill bg-sage-hover px-6 font-semibold text-white"
           >
             {t('staticPages.contact.whatsappCta')}
           </a>
         ) : (
-          <p className="text-body text-muted">{t('whatsapp.unavailable')}</p>
+          <p className="text-body text-ink-muted">{t('whatsapp.unavailable')}</p>
         )}
       </EditorialSection>
 
@@ -85,17 +85,17 @@ function ContactDetails({ settings }: { settings: SettingsMap }) {
           <a
             href={tel}
             aria-label={fill(t('staticPages.contact.callLabel'), { number })}
-            className="inline-flex min-h-12 items-center text-heading font-semibold text-accent underline"
+            className="inline-flex min-h-12 items-center font-display text-[1.6rem] leading-tight font-medium text-sage-hover underline"
           >
             {number}
           </a>
         ) : (
-          <p className="text-body text-muted">{t('staticPages.contact.notPublished')}</p>
+          <p className="text-body text-ink-muted">{t('staticPages.contact.notPublished')}</p>
         )}
       </EditorialSection>
 
       <EditorialSection id="contact-visit" heading={t('staticPages.contact.visitHeading')}>
-        <p className="whitespace-pre-line text-body text-ink">
+        <p className="whitespace-pre-line text-body text-ink-primary">
           {settings.address.trim() || t('staticPages.contact.notPublished')}
         </p>
         {maps ? (
@@ -103,7 +103,7 @@ function ContactDetails({ settings }: { settings: SettingsMap }) {
             href={maps}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex min-h-11 items-center text-small font-medium text-accent underline"
+            className="inline-flex min-h-11 items-center text-small font-medium text-sage-hover underline"
           >
             {t('staticPages.contact.mapCta')}
           </a>
@@ -111,7 +111,7 @@ function ContactDetails({ settings }: { settings: SettingsMap }) {
       </EditorialSection>
 
       <EditorialSection id="contact-hours" heading={t('staticPages.contact.hoursHeading')}>
-        <p className="whitespace-pre-line text-body text-ink">
+        <p className="whitespace-pre-line text-body text-ink-primary">
           {settings.opening_hours.trim() || t('staticPages.contact.notPublished')}
         </p>
       </EditorialSection>

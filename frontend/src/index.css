@@ -1,0 +1,135 @@
+@import 'tailwindcss';
+
+/*
+ * Design tokens (.claude/architecture.md section 7). Components use token-backed
+ * utilities only (bg-accent, text-ink, rounded-card, ...), never raw hex values.
+ * Colours are checked for WCAG AA contrast on --bs-surface (text 4.5:1, UI boundaries 3:1).
+ */
+:root {
+  --bs-accent: #9d174d;
+  --bs-accent-ink: #ffffff;
+  --bs-surface: #fffaf8;
+  --bs-surface-raised: #ffffff;
+  --bs-ink: #1f1a1d;
+  --bs-muted: #6b6066;
+  /* Darkened from #eadfe3 (1.25:1) so input and control edges reach WCAG 1.4.11 3:1 (3.72:1 on surface). */
+  --bs-border: #8a7f85;
+  --bs-danger: #b42318;
+
+  --bs-font-sans: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+
+  --bs-radius-card: 0.75rem;
+  --bs-radius-pill: 9999px;
+  --bs-shadow-card: 0 1px 2px rgb(31 26 29 / 0.08), 0 4px 12px rgb(31 26 29 / 0.06);
+}
+
+/* Tailwind v4 maps the tokens above into utilities (bg-accent, text-muted, rounded-card, ...). */
+@theme {
+  --color-accent: var(--bs-accent);
+  --color-accent-ink: var(--bs-accent-ink);
+  --color-surface: var(--bs-surface);
+  --color-surface-raised: var(--bs-surface-raised);
+  --color-ink: var(--bs-ink);
+  --color-muted: var(--bs-muted);
+  --color-border: var(--bs-border);
+  --color-danger: var(--bs-danger);
+
+  --font-sans: var(--bs-font-sans);
+
+  --text-display: 2rem;
+  --text-display--line-height: 2.5rem;
+  --text-heading: 1.25rem;
+  --text-heading--line-height: 1.75rem;
+  --text-body: 1rem;
+  --text-body--line-height: 1.5rem;
+  --text-small: 0.875rem;
+  --text-small--line-height: 1.25rem;
+
+  --radius-card: var(--bs-radius-card);
+  --radius-pill: var(--bs-radius-pill);
+  --shadow-card: var(--bs-shadow-card);
+
+  /* Storefront: "Modern Minimal Sage & Cream". Used only under the storefront layout.
+     The admin keeps the --bs-* tokens above, so its look does not change. */
+  --bg-canvas: #fdfbf7;
+  --bg-surface: #f3ede4;
+  --accent-primary: #7a8b7b;
+  /* Button fills and link text. White text on this sage passes 4.5:1 (5.48:1); #7A8B7B does not (3.62:1). */
+  --accent-primary-hover: #5e6d5f;
+  --accent-primary-pressed: #4d5b4e;
+  --accent-tint: #e4eae3;
+  --ink-primary: #2d312e;
+  --ink-muted: #5a605b;
+  --border-subtle: #e8e3da;
+  --drawer-dark: #1e221f;
+  --drawer-surface: #2a2f2b;
+  --drawer-line: #3a403b;
+  --drawer-muted: #b5bdb6;
+  --drawer-danger: #fda29b;
+}
+
+/*
+ * Storefront tokens. Utilities: bg-canvas, bg-sand, bg-sage, bg-sage-hover, text-ink-primary,
+ * text-ink-muted, border-border-subtle, bg-drawer-dark, font-display, font-ui, ...
+ */
+@theme {
+  --color-canvas: var(--bg-canvas);
+  --color-sand: var(--bg-surface);
+  --color-sage: var(--accent-primary);
+  --color-sage-hover: var(--accent-primary-hover);
+  --color-sage-pressed: var(--accent-primary-pressed);
+  --color-sage-tint: var(--accent-tint);
+  --color-ink-primary: var(--ink-primary);
+  --color-ink-muted: var(--ink-muted);
+  --color-border-subtle: var(--border-subtle);
+  --color-drawer-dark: var(--drawer-dark);
+  --color-drawer-surface: var(--drawer-surface);
+  --color-drawer-line: var(--drawer-line);
+  --color-drawer-muted: var(--drawer-muted);
+  --color-drawer-danger: var(--drawer-danger);
+
+  --font-display:
+    'Cormorant Garamond', 'Cormorant Garamond Fallback', 'Times New Roman', Georgia, serif;
+  --font-ui:
+    'Plus Jakarta Sans', 'Plus Jakarta Sans Fallback', system-ui, -apple-system, 'Segoe UI', Roboto,
+    sans-serif;
+}
+
+/*
+ * Metric-matched fallbacks. The web fonts load after first paint (font-display: swap), so these
+ * local faces take the same line box and approximate glyph widths while the real fonts load,
+ * which keeps the swap from shifting text (CLS). Values are approximations, verified by Lighthouse.
+ */
+@font-face {
+  font-family: 'Plus Jakarta Sans Fallback';
+  src: local('Arial'), local('Helvetica'), local('Liberation Sans'), local('DejaVu Sans');
+  size-adjust: 94%;
+  ascent-override: 92%;
+  descent-override: 26%;
+  line-gap-override: 0%;
+}
+
+@font-face {
+  font-family: 'Cormorant Garamond Fallback';
+  src: local('Times New Roman'), local('Liberation Serif'), local('Times');
+  size-adjust: 96%;
+  ascent-override: 90%;
+  descent-override: 24%;
+  line-gap-override: 0%;
+}
+
+/* Soft placeholder tiles for hero and lifestyle areas. CSS only, so there are no image requests. */
+@utility tile-sage {
+  background: linear-gradient(145deg, #c9d3c8 0%, #a7b5a5 48%, #7a8b7b 100%);
+}
+
+@utility tile-sand {
+  background: linear-gradient(160deg, #f7f2ea 0%, #ebe3d6 60%, #dfd5c4 100%);
+}
+
+body {
+  margin: 0;
+  background-color: var(--bs-surface);
+  color: var(--bs-ink);
+  font-family: var(--bs-font-sans);
+}

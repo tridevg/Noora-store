@@ -14,10 +14,10 @@ export function Notice({
   return (
     <div
       role={tone === 'error' ? 'alert' : undefined}
-      className={`rounded-card border p-4 text-small ${
+      className={`rounded-[1.25rem] border p-4 text-small ${
         tone === 'error'
           ? 'border-danger text-danger'
-          : 'border-border bg-surface-raised text-muted'
+          : 'border-border-subtle bg-canvas text-ink-muted'
       }`}
     >
       <p>{children}</p>
@@ -25,7 +25,7 @@ export function Notice({
         <button
           type="button"
           onClick={onRetry}
-          className="mt-3 min-h-11 rounded-pill border border-border px-4 font-medium text-ink"
+          className="mt-3 min-h-11 rounded-pill border border-border-subtle px-4 font-medium text-ink-primary"
         >
           {t('common.retry')}
         </button>

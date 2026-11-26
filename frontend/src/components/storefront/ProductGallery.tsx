@@ -11,7 +11,7 @@ export function ProductGallery({ images, alt }: { images: readonly ImageDto[]; a
 
   if (!current) {
     return (
-      <div className="flex aspect-square items-center justify-center rounded-card bg-border text-small text-muted">
+      <div className="flex aspect-square items-center justify-center rounded-[1.25rem] bg-sand text-small text-ink-muted">
         {t('storefront.product.noImage')}
       </div>
     );
@@ -29,7 +29,7 @@ export function ProductGallery({ images, alt }: { images: readonly ImageDto[]; a
     <div className="space-y-3">
       <div
         onMouseMove={follow}
-        className="relative aspect-square overflow-hidden rounded-card bg-surface-raised"
+        className="relative aspect-[3/4] overflow-hidden rounded-[1.25rem] bg-sand"
       >
         {/* The first product image is the likely LCP element: fetched at high priority, never lazy. */}
         <img
@@ -50,7 +50,7 @@ export function ProductGallery({ images, alt }: { images: readonly ImageDto[]; a
           type="button"
           aria-pressed={zoomed}
           onClick={() => setZoomed((value) => !value)}
-          className="absolute right-3 bottom-3 min-h-11 rounded-pill bg-surface-raised/90 px-4 text-small font-medium text-ink shadow-card"
+          className="absolute right-3 bottom-3 min-h-11 rounded-pill bg-canvas/90 px-4 text-small font-medium text-ink-primary"
         >
           {zoomed ? t('storefront.product.zoomOut') : t('storefront.product.zoomIn')}
         </button>
@@ -67,8 +67,8 @@ export function ProductGallery({ images, alt }: { images: readonly ImageDto[]; a
                   setIndex(position);
                   setZoomed(false);
                 }}
-                className={`size-16 overflow-hidden rounded-card border-2 ${
-                  position === index ? 'border-accent' : 'border-transparent'
+                className={`size-16 overflow-hidden rounded-[1.25rem] border-2 ${
+                  position === index ? 'border-sage-hover' : 'border-transparent'
                 }`}
               >
                 <img

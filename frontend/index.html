@@ -14,8 +14,27 @@
       content="Shop ladies’ clothing and book beauty parlour services. Order on WhatsApp."
     />
     <meta property="og:type" content="website" />
+    <!--
+      Storefront fonts: Cormorant Garamond (display) and Plus Jakarta Sans (UI). The stylesheet
+      loads without blocking first paint (media=print swapped on load); font-display=swap keeps
+      text visible in the system fallback meanwhile.
+    -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
+      media="print"
+      onload="this.media = 'all'"
+    />
+    <noscript>
+      <link
+        rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
+      />
+    </noscript>
     <style>
-      /* Visible keyboard focus everywhere (WCAG 2.4.7). Colour comes from tokens.css. */
+      /* Visible keyboard focus everywhere (WCAG 2.4.7). Colour comes from index.css. */
       :focus-visible {
         outline: 3px solid var(--bs-accent, #9d174d);
         outline-offset: 2px;

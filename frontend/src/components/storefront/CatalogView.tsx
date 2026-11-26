@@ -3,6 +3,7 @@ import { useSearchParams } from 'react-router';
 import type { CategoryDto, ProductSummaryDto } from '@beauty-store/shared';
 import { t } from '../../i18n';
 import { useFocusTrap } from '../layout/useFocusTrap';
+import { Select } from '../ui/Select';
 import {
   PER_PAGE,
   parseCatalogParams,
@@ -24,11 +25,11 @@ interface ProductListResponse {
 }
 
 const FIELD_CLASS =
-  'min-h-11 w-full rounded-card border border-border bg-surface-raised px-3 text-ink';
+  'min-h-11 w-full rounded-[1.25rem] border border-border-subtle bg-canvas px-3 text-ink-primary';
 
 /**
  * Catalogue grid shared by /products and /category/:slug. Filters, sort and page live in the URL.
- * `categorySlug` is set on /category/:slug and pins the category; otherwise a category select shows.
+ *`categorySlug` is set on /category/:slug and pins the category; otherwise a category select shows.
  */
 export function CatalogView({ categorySlug }: { categorySlug?: string }) {
   const [params, setParams] = useSearchParams();
@@ -59,7 +60,7 @@ export function CatalogView({ categorySlug }: { categorySlug?: string }) {
           aria-expanded={drawerOpen}
           aria-controls="catalog-filters"
           onClick={() => setDrawerOpen(true)}
-          className="min-h-11 rounded-pill border border-border bg-surface-raised px-4 text-small font-medium text-ink"
+          className="min-h-11 rounded-pill border border-border-subtle bg-canvas px-4 text-small font-medium text-ink-primary"
         >
           {t('storefront.catalog.filters')}
         </button>
@@ -81,23 +82,25 @@ export function CatalogView({ categorySlug }: { categorySlug?: string }) {
 
       <section className="min-w-0 flex-1" aria-labelledby="catalog-heading">
         <div className="flex flex-wrap items-center justify-between gap-3 py-2">
-          <h1 id="catalog-heading" className="text-display font-semibold text-ink">
+          <h1
+            id="catalog-heading"
+            className="font-display text-[2.6rem] leading-[1.05] font-medium text-ink-primary md:text-[3.4rem]"
+          >
             {heading}
           </h1>
-          <label className="flex items-center gap-2 text-small text-muted">
+          <label className="flex items-center gap-2 text-small text-ink-muted">
             <span>{t('storefront.catalog.sortBy')}</span>
-            <select
+            <Select
               value={filters.sort}
               onChange={(event) =>
                 update({ ...filters, sort: event.target.value as ProductSort, page: 1 })
               }
-              className="min-h-11 rounded-card border border-border bg-surface-raised px-3 text-ink"
             >
               <option value="newest">{t('storefront.catalog.sortNewest')}</option>
               <option value="price_asc">{t('storefront.catalog.sortPriceAsc')}</option>
               <option value="price_desc">{t('storefront.catalog.sortPriceDesc')}</option>
               <option value="popularity">{t('storefront.catalog.sortPopularity')}</option>
-            </select>
+            </Select>
           </label>
         </div>
 
@@ -115,7 +118,7 @@ export function CatalogView({ categorySlug }: { categorySlug?: string }) {
             </Notice>
           ) : data && data.items.length > 0 ? (
             <>
-              <p className="pb-3 text-small text-muted">
+              <p className="pb-3 text-small text-ink-muted">
                 {fill(t('storefront.catalog.resultCount'), { count: data.total })}
               </p>
               <ProductGrid products={data.items} />
@@ -131,18 +134,18 @@ export function CatalogView({ categorySlug }: { categorySlug?: string }) {
               type="button"
               disabled={filters.page <= 1}
               onClick={() => update({ ...filters, page: filters.page - 1 })}
-              className="min-h-11 rounded-pill border border-border px-4 text-small text-ink disabled:opacity-40"
+              className="min-h-11 rounded-pill border border-border-subtle px-4 text-small text-ink-primary disabled:opacity-40"
             >
               <span aria-hidden="true">←</span> {t('storefront.catalog.prevPage')}
             </button>
-            <span className="text-small text-muted">
+            <span className="text-small text-ink-muted">
               {fill(t('storefront.catalog.pageOf'), { page: filters.page, total: totalPages })}
             </span>
             <button
               type="button"
               disabled={filters.page >= totalPages}
               onClick={() => update({ ...filters, page: filters.page + 1 })}
-              className="min-h-11 rounded-pill border border-border px-4 text-small text-ink disabled:opacity-40"
+              className="min-h-11 rounded-pill border border-border-subtle px-4 text-small text-ink-primary disabled:opacity-40"
             >
               {t('storefront.catalog.nextPage')} <span aria-hidden="true">→</span>
             </button>
@@ -206,19 +209,25 @@ function FilterPanel({
       aria-modal={open ? true : undefined}
       aria-label={t('storefront.catalog.filters')}
       className={`${
-        open ? 'fixed inset-0 z-40 overflow-y-auto bg-surface p-4' : 'hidden'
+        open ? 'fixed inset-0 z-40 overflow-y-auto bg-canvas p-4' : 'hidden'
       } md:sticky md:top-20 md:block md:h-fit md:w-60 md:shrink-0 md:p-0`}
     >
       <form onSubmit={submit} className="space-y-4">
         <div className="flex items-center justify-between md:hidden">
-          <h2 className="text-heading font-semibold text-ink">{t('storefront.catalog.filters')}</h2>
-          <button type="button" onClick={onClose} className="min-h-11 px-3 text-small text-ink">
+          <h2 className="font-display text-[1.6rem] leading-tight font-medium text-ink-primary">
+            {t('storefront.catalog.filters')}
+          </h2>
+          <button
+            type="button"
+            onClick={onClose}
+            className="min-h-11 px-3 text-small text-ink-primary"
+          >
             {t('storefront.catalog.closeFilters')}
           </button>
         </div>
 
         {showCategory ? (
-          <label className="block space-y-1 text-small text-muted">
+          <label className="block space-y-1 text-small text-ink-muted">
             <span>{t('storefront.catalog.category')}</span>
             <select
               className={FIELD_CLASS}
@@ -236,7 +245,7 @@ function FilterPanel({
         ) : null}
 
         <div className="grid grid-cols-2 gap-3">
-          <label className="space-y-1 text-small text-muted">
+          <label className="space-y-1 text-small text-ink-muted">
             <span>{t('storefront.catalog.minPrice')}</span>
             <input
               inputMode="numeric"
@@ -245,7 +254,7 @@ function FilterPanel({
               className={FIELD_CLASS}
             />
           </label>
-          <label className="space-y-1 text-small text-muted">
+          <label className="space-y-1 text-small text-ink-muted">
             <span>{t('storefront.catalog.maxPrice')}</span>
             <input
               inputMode="numeric"
@@ -256,7 +265,7 @@ function FilterPanel({
           </label>
         </div>
 
-        <label className="block space-y-1 text-small text-muted">
+        <label className="block space-y-1 text-small text-ink-muted">
           <span>{t('storefront.catalog.size')}</span>
           <input
             value={draft.size}
@@ -266,7 +275,7 @@ function FilterPanel({
           />
         </label>
 
-        <label className="block space-y-1 text-small text-muted">
+        <label className="block space-y-1 text-small text-ink-muted">
           <span>{t('storefront.catalog.colour')}</span>
           <input
             value={draft.colour}
@@ -276,7 +285,7 @@ function FilterPanel({
           />
         </label>
 
-        <label className="flex min-h-11 items-center gap-3 text-small text-ink">
+        <label className="flex min-h-11 items-center gap-3 text-small text-ink-primary">
           <input
             type="checkbox"
             checked={draft.inStock}
@@ -290,13 +299,13 @@ function FilterPanel({
           <button
             type="button"
             onClick={reset}
-            className="min-h-11 flex-1 rounded-pill border border-border text-small text-ink"
+            className="min-h-11 flex-1 rounded-pill border border-border-subtle text-small text-ink-primary"
           >
             {t('storefront.catalog.resetFilters')}
           </button>
           <button
             type="submit"
-            className="min-h-11 flex-1 rounded-pill bg-accent text-small font-semibold text-accent-ink"
+            className="min-h-11 flex-1 rounded-pill bg-sage-hover text-small font-semibold text-white"
           >
             {t('storefront.catalog.applyFilters')}
           </button>

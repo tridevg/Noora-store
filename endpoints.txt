@@ -111,7 +111,9 @@ DEPLOY
 ------
 npx wrangler login --device --browser=false   (once)
 cd backend && npx wrangler deploy
-npx wrangler pages deploy frontend/dist --project-name=noora-studio
+cd frontend && npx wrangler pages deploy dist --project-name=noora-studio --branch=main
+# Run from frontend/ so the Pages Functions bundle (frontend/functions) is included.
+# --branch=main publishes to production; without it a branch deploy is preview only.
 
 Full contracts: .claude/schema.md
 Architecture:   .claude/architecture.md
