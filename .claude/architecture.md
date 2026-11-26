@@ -171,3 +171,9 @@ Backend and frontend import `@beauty-store/shared` as TypeScript source through 
 - Frontend: Vitest unit tests (cart reducer, storefront helpers). No DOM snapshot tests in v1.
 - Backend: Vitest with `@cloudflare/vitest-pool-workers` (Miniflare-backed). Migrations are applied in setup. Tests cover public endpoints and cache headers, order total recomputation, auth, CSRF, rate limiting, CRUD, and purge.
 - Verification: `tsc --noEmit` per workspace, bundle-size script, headless Lighthouse (Phase 6).
+
+
+## Phase 5 status (frontend built)
+- Initial JS gzip: 134,547 bytes (limit 150,000). Every route is React.lazy; only StorefrontLayout and CartProvider are eager.
+- Storefront: /, /products, /category/:slug, /product/:slug, /services, /cart. Admin: /admin/login and the dashboard, products, products/:id, services, orders, and settings routes.
+- Known gaps: About, Contact, Shipping, Privacy and NotFound are still placeholders (Phase 6). Stock is not enforced at add-to-cart or checkout. Orphaned R2 objects are possible if the link POST fails. There are no image reorder or alt-text endpoints. Categories and settings in the admin are read from the public GET endpoints.

@@ -48,3 +48,10 @@
 3. Smoke-test readiness: `npm run dev` on both 8787 and 5173, D1 seeded, /images/* resolving. Print the local admin credentials and the ssh -L 5173:localhost:5173 command. WAIT for user go-ahead.
 4. Phase 6 (static pages, SEO, a11y, Lighthouse, bundle < 150 KB gz). STOP before Phase 7.
 Open: R17 (_redirects proxy for Phase 7) not approved. Lighthouse needs a Chromium that is not yet installed.
+
+
+## Phase 5 verified (2026-11-26)
+- Verifier PASS. Initial JS 134,547 bytes gzip.
+- Flag: money conversions in frontend (components/admin/money.ts, components/storefront/catalogQuery.ts) use rupees*100 and toFixed(2) for display. Integer-safe. Reviewed, not blocking.
+- Gaps carried to Phase 6 or later: placeholder static pages; stock not enforced at cart or checkout; WhatsApp message uses cart prices while the server total is authoritative; window.open after await can be pop-up blocked; admin image orphan cleanup and reorder/alt-text endpoints absent.
+- Next: Phase 6 requires user approval. Smoke-test readiness step still pending.

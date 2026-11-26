@@ -2,7 +2,7 @@
   "project": "beauty-fashion-store",
   "spec": "docs/superpowers/specs/2026-11-26-beauty-store-v1-design.md",
   "plan": "docs/superpowers/plans/implementation-plan.md",
-  "current_phase": 4,
+  "current_phase": 5,
   "phases": {
     "0": {
       "name": "EC2 env check, bootstrap, planning, state init",
@@ -26,7 +26,7 @@
     },
     "5": {
       "name": "Frontend storefront + admin UI",
-      "status": "pending"
+      "status": "verified"
     },
     "6": {
       "name": "Verification (tsc, Vitest, bundle, Lighthouse)",
@@ -95,6 +95,17 @@
       "typecheck": 0,
       "lint": 0,
       "format_check": 0
+    },
+    "phase5": {
+      "shared": 29,
+      "backend": 100,
+      "frontend": 30,
+      "typecheck": 0,
+      "lint": 0,
+      "format_check": 0,
+      "build": 0,
+      "initial_js_gzip_bytes": 134547,
+      "limit_bytes": 150000
     }
   },
   "decisions": [
@@ -115,6 +126,6 @@
     "2": "user approved 2026-11-26",
     "3": "user approved 2026-11-26",
     "4": "user approved 2026-11-26",
-    "5": "user approved 2026-11-26, to start only after Phase 4 finishes cleanly"
+    "5": "user approved 2026-11-26"
   }
 }
