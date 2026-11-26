@@ -22,6 +22,29 @@ export interface CreateOrderInput {
 /** Raised for business-rule conflicts; mapped to 409 by the route. */
 export class ConflictError extends Error {}
 
+/** One cart line that asks for more units than D1 holds. */
+export interface StockShortage {
+  variant_id: number;
+  requested: number;
+  available: number;
+}
+
+/** Raised when one or more lines exceed stock. Nothing is written. Mapped to 409 with per-line detail. */
+export class StockConflictError extends ConflictError {
+  constructor(readonly shortages: StockShortage[]) {
+    super('Some items are out of stock');
+  }
+}
+
+/** Error `fields` entries for a stock 409: key `variant_<id>`, value `requested <n>, available <m>`. */
+export function stockFields(shortages: readonly StockShortage[]): Record<string, string> {
+  const fields: Record<string, string> = {};
+  for (const s of shortages) {
+    fields[`variant_${s.variant_id}`] = `requested ${s.requested}, available ${s.available}`;
+  }
+  return fields;
+}
+
 interface VariantPriceRow {
   variant_id: number;
   product_id: number;
@@ -62,10 +85,13 @@ export async function createOrder(db: D1Database, input: CreateOrderInput): Prom
   const rows = await Promise.all(lookups);
 
   const items: OrderItemDto[] = [];
+  const shortages: StockShortage[] = [];
   for (const row of rows) {
     if (row === null) throw new ConflictError('An item is unavailable');
     const qty = wanted.get(row.variant_id)?.qty ?? 0;
-    if (qty > row.stock) throw new ConflictError(`Not enough stock for ${row.name}`);
+    if (qty > row.stock) {
+      shortages.push({ variant_id: row.variant_id, requested: qty, available: row.stock });
+    }
     items.push({
       product_id: row.product_id,
       variant_id: row.variant_id,
@@ -76,10 +102,18 @@ export async function createOrder(db: D1Database, input: CreateOrderInput): Prom
       unit_price_paise: row.price_paise,
     });
   }
+  if (shortages.length > 0) throw new StockConflictError(shortages);
 
   const total = sumPaise(items.map((i) => i.unit_price_paise * i.qty));
   const createdAt = new Date().toISOString();
-  const result = await db
+  // One D1 batch = one transaction. Each decrement is guarded by the stock CHECK (stock >= 0),
+  // so a line that lost a race fails the whole batch and rolls back the order insert too.
+  const decrements = items.map((i) =>
+    db
+      .prepare('UPDATE product_variants SET stock = stock - ? WHERE id = ? AND product_id = ?')
+      .bind(i.qty, i.variant_id, i.product_id),
+  );
+  const insert = db
     .prepare(
       `INSERT INTO orders (customer_name, customer_phone, address, items_json, total_paise, status, created_at)
        VALUES (?, ?, ?, ?, ?, 'new', ?)`,
@@ -91,11 +125,27 @@ export async function createOrder(db: D1Database, input: CreateOrderInput): Prom
       JSON.stringify(items),
       total,
       createdAt,
-    )
-    .run();
+    );
+
+  let results: D1Result[];
+  try {
+    results = await db.batch([...decrements, insert]);
+  } catch (err) {
+    // Lost a race for the last unit(s): report which lines are short now, if any.
+    const current = await lookupStock(db, items);
+    const raced = items
+      .filter((i) => i.qty > (current.get(i.variant_id) ?? 0))
+      .map((i) => ({
+        variant_id: i.variant_id,
+        requested: i.qty,
+        available: current.get(i.variant_id) ?? 0,
+      }));
+    if (raced.length > 0) throw new StockConflictError(raced);
+    throw err;
+  }
 
   return {
-    id: result.meta.last_row_id,
+    id: results[results.length - 1]!.meta.last_row_id,
     customer_name: input.customer_name,
     customer_phone: input.customer_phone,
     address: input.address,
@@ -104,6 +154,16 @@ export async function createOrder(db: D1Database, input: CreateOrderInput): Prom
     status: 'new',
     created_at: createdAt,
   };
+}
+
+async function lookupStock(db: D1Database, items: OrderItemDto[]): Promise<Map<number, number>> {
+  const rows = await db
+    .prepare(
+      `SELECT id, stock FROM product_variants WHERE id IN (${items.map(() => '?').join(', ')})`,
+    )
+    .bind(...items.map((i) => i.variant_id))
+    .all<{ id: number; stock: number }>();
+  return new Map(rows.results.map((r) => [r.id, r.stock]));
 }
 
 export const orderRoutes = new Hono<AppEnv>();
@@ -133,6 +193,9 @@ orderRoutes.post('/api/orders', async (c) => {
   try {
     order = await createOrder(c.env.DB, parsed.data);
   } catch (err) {
+    if (err instanceof StockConflictError) {
+      return apiError(c, 409, 'conflict', err.message, stockFields(err.shortages));
+    }
     if (err instanceof ConflictError) return apiError(c, 409, 'conflict', err.message);
     throw err;
   }

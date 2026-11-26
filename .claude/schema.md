@@ -223,5 +223,39 @@ Response schemas: `AdminProductResponseSchema`, `AdminServicesResponseSchema`, `
 
 On each mutation marked "yes" above, the backend deletes these exact keys (origin + path, no query): `/api/categories`, `/api/products`, `/api/services`, `/api/settings`, `/api/products/<slug>` for every affected product (old and new slug). Query-string variants of list endpoints are not enumerated; they expire on their own within `s-maxage=300`.
 
+### Phase 6 additions
+
+Stock check at checkout and two SEO routes. The existing contract rows above are unchanged.
+
+**`POST /api/orders` (existing route, new 409 response)**
+
+Stock is checked in D1 before the order is written. The order insert and the stock decrements run in one D1 batch, so a failed check writes nothing and a success decrements every line in the same transaction. Two orders for the last unit cannot both succeed: the second one gets `409`.
+
+| Status | Code | When | Body |
+|---|---|---|---|
+| 409 | `conflict` | One or more lines request more units than `product_variants.stock` holds (also when a concurrent order takes the units between the check and the batch) | `{ "error": { "code": "conflict", "message": "Some items are out of stock", "fields": { "variant_<id>": "requested <n>, available <m>" } } }`, one entry per short line |
+
+Other 409 cases (unknown, inactive or mismatched variant) keep the existing message and carry no `fields`. Each `variant_<id>` key is a variant id from the cart. The value gives the requested and available counts as strings. `Cache-Control: no-store` as before.
+
+**`GET /sitemap.xml`**
+
+| Method | Path | Auth | Cache | Request schema | Response (2xx) |
+|---|---|---|---|---|---|
+| GET | `/sitemap.xml` | public | `PUBLIC` | none | `200` `application/xml; charset=utf-8`, sitemap 0.9 `<urlset>` |
+
+The sitemap lists the static public routes (`/`, `/products`, `/services`, `/about`, `/contact`, `/shipping-returns`, `/privacy-policy`), every category as `/category/<slug>`, and every active product as `/product/<slug>` with `<lastmod>` from `products.updated_at`. Inactive products, `/admin`, and `/cart` are omitted. Slugs are XML-escaped and percent-encoded in the path.
+
+**`GET /robots.txt`**
+
+| Method | Path | Auth | Cache | Request schema | Response (2xx) |
+|---|---|---|---|---|---|
+| GET | `/robots.txt` | public | `PUBLIC` | none | `200` `text/plain; charset=utf-8` |
+
+Body: `User-agent: *`, `Allow: /`, `Disallow: /admin`, `Disallow: /api/`, `Disallow: /cart`, then `Sitemap: <origin>/sitemap.xml`.
+
+**Origin for absolute URLs.** Both routes use the optional Worker variable `SITE_URL` (no trailing slash) when it is set, and the request origin otherwise. Behind the Pages proxy the Worker sees its own `*.workers.dev` host, so Phase 7 should set `SITE_URL` to the Pages origin. The Pages `_redirects` file also needs `/sitemap.xml` and `/robots.txt` proxy rules (see Phase 7 in the plan). Without them, the SPA fallback serves `index.html` for these paths.
+
+**R2 cleanup (no contract change).** When `POST /api/admin/products/:id/images` fails on the D1 insert, the uploaded `full_r2_key` and `thumb_r2_key` objects are deleted before the error response. Keys that an existing `product_images` row still references are kept. Deleting a product or an image also deletes its R2 objects, as before.
+
 ## Additional route (Phase 3 audit)
 - `GET /api/health` — returns `{"ok": true}`. Not part of the public contract table; used for smoke checks only.

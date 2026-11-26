@@ -10,6 +10,9 @@ export const en = {
     services: 'Services',
     cart: 'Cart',
     whatsapp: 'WhatsApp',
+    primaryLabel: 'Primary',
+    siteLabel: 'Site',
+    footerLabel: 'Footer',
   },
   header: {
     searchLabel: 'Search products',
@@ -318,6 +321,12 @@ export const en = {
       phoneLabel: 'Phone number (WhatsApp)',
       addressLabel: 'Delivery address',
       placeOrder: 'Place Order on WhatsApp',
+      onlyLeft: 'Only {count} left in stock',
+      conflictGeneric:
+        'Some items in your cart are no longer available in the quantity you asked for. Adjust your cart and try again. Your cart has been kept.',
+      conflictListed:
+        'These items do not have enough stock: {items}. Lower the quantity or remove them, then try again. Your cart has been kept.',
+      conflictStillChecking: 'Checking current stock…',
       placing: 'Placing order…',
       placed: 'Order #{id} placed',
       placedBody: 'Your order is saved. Send it on WhatsApp so we can confirm it.',
@@ -329,6 +338,146 @@ export const en = {
         address: 'Enter your delivery address.',
         items: 'Your cart has items that cannot be ordered. Please review it.',
       },
+    },
+  },
+  footer: {
+    tagline: 'Beauty and ladies’ fashion, chosen with care.',
+    shop: 'Shop',
+    help: 'Help',
+    about: 'About us',
+    contact: 'Contact',
+    shippingReturns: 'Shipping and returns',
+    privacyPolicy: 'Privacy policy',
+    rights: 'All rights reserved.',
+  },
+  staticPages: {
+    about: {
+      eyebrow: 'About us',
+      title: 'A small studio for beauty and ladies’ fashion',
+      lead: 'We are a neighbourhood beauty parlour and clothing store. We choose each piece and each treatment ourselves, and we answer every enquiry personally.',
+      storyHeading: 'Our story',
+      storyBody:
+        'We started with a single chair and a rail of carefully chosen kurtas and sarees. The shop grew around the same idea: fewer, better things, and advice from people who know them.',
+      valuesHeading: 'What we care about',
+      value1Title: 'Honest fit and fabric',
+      value1Body:
+        'We describe sizes and fabrics plainly, so you know what to expect before you buy.',
+      value2Title: 'Care you can book',
+      value2Body:
+        'Our parlour services are listed with their duration and price, with no hidden extras.',
+      value3Title: 'Talk to a person',
+      value3Body: 'Questions go to a real person on WhatsApp, usually within the same day.',
+      ctaHeading: 'Looking for something specific?',
+      ctaBody: 'Browse the shop or send us a message and we will help you find it.',
+      ctaShop: 'Browse the shop',
+      ctaContact: 'Contact us',
+    },
+    contact: {
+      eyebrow: 'Contact',
+      title: 'Visit, call or message us',
+      lead: 'The quickest way to reach us is WhatsApp. You can also call during opening hours or visit the shop.',
+      whatsappHeading: 'WhatsApp',
+      whatsappCta: 'Chat on WhatsApp',
+      callHeading: 'Call',
+      callLabel: 'Call {number}',
+      visitHeading: 'Visit',
+      mapCta: 'Open in Google Maps',
+      hoursHeading: 'Opening hours',
+      notPublished: 'Not published yet.',
+      loading: 'Loading contact details…',
+      unavailable: 'Contact details are unavailable right now. Please try again later.',
+    },
+    shipping: {
+      eyebrow: 'Help',
+      title: 'Shipping and returns',
+      lead: 'Here is how orders reach you, how payment works and what to do if something is not right.',
+      deliveryHeading: 'Delivery',
+      deliveryBody:
+        'Orders are confirmed with you on WhatsApp before they are dispatched. We deliver within the local area, and we confirm the delivery date when we confirm your order.',
+      paymentHeading: 'Payment',
+      paymentBody:
+        'Pay in cash or by UPI on delivery. No payment details are collected on this website.',
+      returnsHeading: 'Returns and exchanges',
+      returnsBody:
+        'If an item is damaged or is not what you ordered, tell us on WhatsApp within 48 hours of delivery and we will arrange an exchange or refund. Items must be unused and in their original packing.',
+      contactHeading: 'Questions',
+      contactBody: 'Message us on WhatsApp and we will reply as soon as we can.',
+    },
+    privacy: {
+      eyebrow: 'Legal',
+      title: 'Privacy policy',
+      lead: 'We collect only what we need to take and deliver your order. This page explains what that is.',
+      dataHeading: 'What we collect',
+      dataBody:
+        'When you place an order we keep your name, phone number, delivery address and the items you chose. We do not collect payment card details.',
+      useHeading: 'How we use it',
+      useBody:
+        'We use these details only to confirm, pack and deliver your order and to contact you about it on WhatsApp.',
+      sharingHeading: 'Sharing',
+      sharingBody:
+        'We do not sell your details. They are shared only with the people needed to deliver your order.',
+      retentionHeading: 'How long we keep it',
+      retentionBody:
+        'Order records are kept for as long as needed for accounting and returns, then deleted.',
+      contactHeading: 'Your choices',
+      contactBody:
+        'You can ask us to see, correct or delete your details by messaging us on WhatsApp.',
+    },
+    notFound: {
+      code: '404',
+      title: 'We could not find that page',
+      body: 'The link may be out of date, or the page may have moved. Try one of these instead.',
+      shop: 'Browse the shop',
+      services: 'Our services',
+      contact: 'Contact us',
+    },
+  },
+  seo: {
+    siteName: 'Beauty Store',
+    home: {
+      title: 'Beauty and ladies’ fashion',
+      description: 'Shop ladies’ clothing and book beauty parlour services. Order on WhatsApp.',
+    },
+    products: {
+      title: 'Shop',
+      description:
+        'Browse ladies’ clothing and beauty products, filtered by size, colour and price.',
+    },
+    category: {
+      title: 'Shop by category',
+      description: 'Browse this category of ladies’ clothing and beauty products.',
+    },
+    productDetail: {
+      title: 'Product',
+      description: 'See sizes, colours, stock and price, then add this item to your cart.',
+    },
+    services: {
+      title: 'Services',
+      description: 'Beauty parlour services with duration and price. Enquire on WhatsApp.',
+    },
+    cart: {
+      title: 'Cart',
+      description: 'Review your cart and place your order on WhatsApp.',
+    },
+    about: {
+      title: 'About us',
+      description: 'Our story, our values and how we work with customers.',
+    },
+    contact: {
+      title: 'Contact',
+      description: 'Call, message on WhatsApp or visit the shop. Opening hours and map.',
+    },
+    shippingReturns: {
+      title: 'Shipping and returns',
+      description: 'How orders are delivered, how to pay on delivery and our returns policy.',
+    },
+    privacyPolicy: {
+      title: 'Privacy policy',
+      description: 'What customer details we collect for orders, how we use them and your choices.',
+    },
+    notFound: {
+      title: 'Page not found',
+      description: 'This page does not exist. Browse the shop or contact us instead.',
     },
   },
 } as const;

@@ -8,6 +8,13 @@ import { Notice } from '../../components/storefront/Notice';
 import { QuantityStepper } from '../../components/storefront/QuantityStepper';
 import { buildOrderWhatsAppUrl } from '../../components/storefront/orderWhatsApp';
 import {
+  describeLine,
+  linesOverStock,
+  maxQtyForStock,
+  orderConflictMessage,
+} from '../../components/storefront/stockCap';
+import { useCartStock } from '../../components/storefront/useCartStock';
+import {
   fieldForPath,
   fieldMessage,
   validateCheckout,
@@ -37,6 +44,7 @@ const FIELD_CLASS =
 export default function CartPage() {
   const { lines, subtotalPaise, setQty, removeLine, clear } = useCart();
   const settings = useSettings();
+  const { stock, refresh } = useCartStock(lines);
   const [form, setForm] = useState<CustomerForm>(EMPTY_FORM);
   const [errors, setErrors] = useState<FieldErrors>({});
   const [formError, setFormError] = useState<string | null>(null);
@@ -76,6 +84,13 @@ export default function CartPage() {
       clear();
       setForm(EMPTY_FORM);
     } catch (error) {
+      if (error instanceof ApiError && error.status === 409) {
+        // The cart is kept. Re-check stock so the message names the lines that are now short.
+        const current = await refresh(lines).catch(() => null);
+        const names = current ? linesOverStock(lines, current).map(describeLine) : [];
+        setFormError(orderConflictMessage(error, names) ?? errorMessage(error));
+        return;
+      }
       if (error instanceof ApiError && error.code === 'validation_failed' && error.fields) {
         // Server field names map to form fields; messages come from en.ts, not the server.
         const next: FieldErrors = {};
@@ -147,6 +162,7 @@ export default function CartPage() {
             <CartRow
               key={line.variantId}
               line={line}
+              max={maxQtyForStock(stock.get(line.variantId))}
               onQty={(qty) => setQty(line.variantId, qty)}
               onRemove={() => removeLine(line.variantId)}
             />
@@ -239,10 +255,12 @@ function openWhatsApp(url: string) {
 
 function CartRow({
   line,
+  max,
   onQty,
   onRemove,
 }: {
   line: CartLine;
+  max: number;
   onQty: (qty: number) => void;
   onRemove: () => void;
 }) {
@@ -268,7 +286,7 @@ function CartRow({
         </button>
       </div>
       <div className="flex flex-col items-end justify-between gap-2">
-        <QuantityStepper value={line.qty} onChange={onQty} />
+        <QuantityStepper value={line.qty} max={max} onChange={onQty} />
         <p className="text-small font-semibold text-ink">{formatPaise(lineTotalPaise(line))}</p>
       </div>
     </li>

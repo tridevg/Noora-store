@@ -1,7 +1,8 @@
-import { useState, type FormEvent } from 'react';
+import { useRef, useState, type FormEvent } from 'react';
 import { useSearchParams } from 'react-router';
 import type { CategoryDto, ProductSummaryDto } from '@beauty-store/shared';
 import { t } from '../../i18n';
+import { useFocusTrap } from '../layout/useFocusTrap';
 import {
   PER_PAGE,
   parseCatalogParams,
@@ -176,6 +177,9 @@ function FilterPanel({
   onClose,
 }: FilterPanelProps) {
   const [draft, setDraft] = useState<CatalogFilters>(filters);
+  const panelRef = useRef<HTMLElement>(null);
+  // Only the phone drawer is modal. The desktop sidebar is never open, so the trap stays idle there.
+  useFocusTrap(panelRef, open, onClose);
 
   function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -196,7 +200,10 @@ function FilterPanel({
 
   return (
     <aside
+      ref={panelRef}
       id={id}
+      role={open ? 'dialog' : undefined}
+      aria-modal={open ? true : undefined}
       aria-label={t('storefront.catalog.filters')}
       className={`${
         open ? 'fixed inset-0 z-40 overflow-y-auto bg-surface p-4' : 'hidden'

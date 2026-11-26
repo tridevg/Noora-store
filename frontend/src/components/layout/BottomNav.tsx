@@ -17,7 +17,7 @@ export function BottomNav({ whatsappHref }: BottomNavProps) {
   const { itemCount } = useCart();
   return (
     <nav
-      aria-label="Primary"
+      aria-label={t('nav.primaryLabel')}
       className="fixed inset-x-0 bottom-0 z-30 border-t border-border bg-surface-raised pb-[env(safe-area-inset-bottom)] md:hidden"
     >
       <ul className="flex">
@@ -53,6 +53,7 @@ export function BottomNav({ whatsappHref }: BottomNavProps) {
               href={whatsappHref}
               target="_blank"
               rel="noopener noreferrer"
+              aria-label={t('whatsapp.fabLabel')}
               className="flex min-h-14 flex-1 flex-col items-center justify-center text-small text-muted"
             >
               {t('nav.whatsapp')}

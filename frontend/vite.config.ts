@@ -24,4 +24,15 @@ export default defineConfig({
     strictPort: true,
     proxy,
   },
+  build: {
+    rollupOptions: {
+      treeshake: {
+        // The shared barrel re-exports Zod schemas whose modules only define constants.
+        // Marking them side-effect free lets the storefront's eager path (cart math, WhatsApp
+        // links) stop pulling Zod (about 25 KB gzip) into the initial bundle. Admin and
+        // checkout chunks still import the schemas they use.
+        moduleSideEffects: (id) => !id.includes('/shared/src/schemas/'),
+      },
+    },
+  },
 });

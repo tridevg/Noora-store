@@ -130,4 +130,68 @@ describe('POST /api/admin/products/:id/images', () => {
     });
     expect(res.status).toBe(409);
   });
+
+  it('deletes the uploaded R2 objects when the D1 link insert fails', async () => {
+    // The fixture already links products/1 full key, so a second insert collides on UNIQUE r2_key.
+    const session = await login();
+    const liveFull = 'products/1/11111111-1111-4111-8111-111111111111-full.webp';
+    const liveThumb = 'products/1/11111111-1111-4111-8111-111111111111-thumb.webp';
+    const newUuid = '55555555-5555-4555-8555-555555555555';
+    const newFull = `products/1/${newUuid}-full.webp`;
+    const newThumb = `products/1/${newUuid}-thumb.webp`;
+    for (const key of [liveFull, liveThumb, newFull, newThumb]) {
+      await env.IMAGES.put(key, new Uint8Array([1]), {
+        httpMetadata: { contentType: 'image/webp' },
+      });
+    }
+    const res = await SELF.fetch(`${BASE}/api/admin/products/1/images`, {
+      method: 'POST',
+      headers: {
+        Cookie: session.cookie,
+        'X-CSRF-Token': session.csrf,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        full_r2_key: liveFull,
+        thumb_r2_key: newThumb,
+        alt_text: '',
+        sort_order: 1,
+      }),
+    });
+    expect(res.status).toBe(409);
+    expect(await env.IMAGES.head(newThumb)).toBeNull();
+    // The live image's full object is referenced by an existing row, so it must survive.
+    expect(await env.IMAGES.head(liveFull)).not.toBeNull();
+    expect(await env.IMAGES.head(newFull)).not.toBeNull();
+    await env.IMAGES.delete([liveFull, liveThumb, newFull]);
+  });
+
+  it('deletes both R2 objects when an image row is deleted', async () => {
+    const session = await login();
+    const key = `products/2/${UUID}-full.webp`;
+    const thumb = `products/2/${UUID}-thumb.webp`;
+    await env.IMAGES.put(key, new Uint8Array([1]), { httpMetadata: { contentType: 'image/webp' } });
+    await env.IMAGES.put(thumb, new Uint8Array([1]), {
+      httpMetadata: { contentType: 'image/webp' },
+    });
+    const linked = await SELF.fetch(`${BASE}/api/admin/products/2/images`, {
+      method: 'POST',
+      headers: {
+        Cookie: session.cookie,
+        'X-CSRF-Token': session.csrf,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ full_r2_key: key, thumb_r2_key: thumb, alt_text: '', sort_order: 0 }),
+    });
+    expect(linked.status).toBe(201);
+    const { image } = (await linked.json()) as { image: { id: number } };
+
+    const del = await SELF.fetch(`${BASE}/api/admin/products/2/images/${image.id}`, {
+      method: 'DELETE',
+      headers: { Cookie: session.cookie, 'X-CSRF-Token': session.csrf },
+    });
+    expect(del.status).toBe(204);
+    expect(await env.IMAGES.head(key)).toBeNull();
+    expect(await env.IMAGES.head(thumb)).toBeNull();
+  });
 });

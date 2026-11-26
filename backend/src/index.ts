@@ -5,6 +5,7 @@ import { apiError } from './http/errors';
 import { publicRoutes } from './routes/public';
 import { orderRoutes } from './routes/orders';
 import { imageRoutes } from './routes/images';
+import { seoRoutes } from './routes/seo';
 import { adminRoutes } from './admin';
 
 const app = new Hono<AppEnv>();
@@ -15,6 +16,7 @@ app.route('/api/admin', adminRoutes);
 app.route('/', publicRoutes);
 app.route('/', orderRoutes);
 app.route('/', imageRoutes);
+app.route('/', seoRoutes);
 
 app.notFound((c) => apiError(c, 404, 'not_found', 'Not found'));
 

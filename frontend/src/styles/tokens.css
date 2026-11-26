@@ -3,7 +3,7 @@
 /*
  * Design tokens (.claude/architecture.md section 7). Components use token-backed
  * utilities only (bg-accent, text-ink, rounded-card, ...), never raw hex values.
- * Colours are checked for WCAG AA text contrast on --bs-surface.
+ * Colours are checked for WCAG AA contrast on --bs-surface (text 4.5:1, UI boundaries 3:1).
  */
 :root {
   --bs-accent: #9d174d;
@@ -12,7 +12,8 @@
   --bs-surface-raised: #ffffff;
   --bs-ink: #1f1a1d;
   --bs-muted: #6b6066;
-  --bs-border: #eadfe3;
+  /* Darkened from #eadfe3 (1.25:1) so input and control edges reach WCAG 1.4.11 3:1 (3.72:1 on surface). */
+  --bs-border: #8a7f85;
   --bs-danger: #b42318;
 
   --bs-font-sans: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;

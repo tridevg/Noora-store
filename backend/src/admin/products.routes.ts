@@ -12,6 +12,7 @@ import {
 import { apiError } from '../http/errors';
 import { purgePublicCache } from '../cache/purge';
 import { clientOrigin } from './origin';
+import { deleteOrphanedObjects } from './r2Cleanup';
 import {
   dbWriteError,
   likePattern,
@@ -311,6 +312,7 @@ productsRoutes.post('/products/:id/images', async (c) => {
       .run();
     imageId = result.meta.last_row_id;
   } catch (err) {
+    await deleteOrphanedObjects(c.env, [data.full_r2_key, data.thumb_r2_key]);
     return dbWriteError(c, err, 'insert');
   }
 

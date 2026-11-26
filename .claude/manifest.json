@@ -2,7 +2,7 @@
   "project": "beauty-fashion-store",
   "spec": "docs/superpowers/specs/2026-11-26-beauty-store-v1-design.md",
   "plan": "docs/superpowers/plans/implementation-plan.md",
-  "current_phase": 5,
+  "current_phase": 6,
   "phases": {
     "0": {
       "name": "EC2 env check, bootstrap, planning, state init",
@@ -30,7 +30,8 @@
     },
     "6": {
       "name": "Verification (tsc, Vitest, bundle, Lighthouse)",
-      "status": "pending"
+      "status": "partial",
+      "note": "Lighthouse (user-space Playwright Chromium, mobile): home Perf 86 LCP 2.5s (target 90, <2.5s) FAIL; product Perf 94 LCP 2.4s PASS; A11y 100 and SEO 92 on both. Carried into Phase 7."
     },
     "7": {
       "name": "Cloudflare deploy",
@@ -106,6 +107,25 @@
       "build": 0,
       "initial_js_gzip_bytes": 134547,
       "limit_bytes": 150000
+    },
+    "phase6": {
+      "shared": 29,
+      "backend": 109,
+      "frontend": 42,
+      "bundle_gzip_bytes": 110402,
+      "limit_bytes": 150000,
+      "lighthouse_home": {
+        "perf": 86,
+        "a11y": 100,
+        "seo": 92,
+        "lcp_s": 2.5
+      },
+      "lighthouse_product": {
+        "perf": 94,
+        "a11y": 100,
+        "seo": 92,
+        "lcp_s": 2.4
+      }
     }
   },
   "decisions": [
@@ -126,6 +146,7 @@
     "2": "user approved 2026-11-26",
     "3": "user approved 2026-11-26",
     "4": "user approved 2026-11-26",
-    "5": "user approved 2026-11-26"
+    "5": "user approved 2026-11-26",
+    "6": "user approved 2026-11-26"
   }
 }

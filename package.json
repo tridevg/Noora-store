@@ -17,13 +17,16 @@
     "lint": "eslint .",
     "format": "prettier --write package.json tsconfig.base.json eslint.config.js .prettierrc.json README.md shared backend frontend --ignore-path .gitignore",
     "format:check": "prettier --check package.json tsconfig.base.json eslint.config.js .prettierrc.json README.md shared backend frontend --ignore-path .gitignore",
-    "build": "npm run build --workspaces --if-present"
+    "build": "npm run build --workspaces --if-present",
+    "audit:lighthouse": "CHROME_PATH=$(node -e \"console.log(require('playwright').chromium.executablePath())\") lighthouse http://127.0.0.1:5173/ --chrome-flags=\"--headless --no-sandbox\" --only-categories=performance,accessibility,seo --output=json --output-path=./lighthouse-report.json --quiet"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "concurrently": "^10.0.7",
     "eslint": "^10.15.0",
     "globals": "^17.0.0",
+    "lighthouse": "^13.6.0",
+    "playwright": "^1.65.1",
     "prettier": "^3.10.1",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.74.0",

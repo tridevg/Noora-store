@@ -31,9 +31,15 @@ export function ProductGallery({ images, alt }: { images: readonly ImageDto[]; a
         onMouseMove={follow}
         className="relative aspect-square overflow-hidden rounded-card bg-surface-raised"
       >
+        {/* The first product image is the likely LCP element: fetched at high priority, never lazy. */}
         <img
           src={current.full_url}
+          srcSet={`${current.thumb_url} 400w, ${current.full_url} 1600w`}
+          sizes="(min-width: 768px) 50vw, 100vw"
           alt={current.alt_text || alt}
+          width={1600}
+          height={1600}
+          fetchPriority="high"
           decoding="async"
           style={zoomed ? { transform: 'scale(2)', transformOrigin: origin } : undefined}
           className={`size-full object-cover transition-transform duration-200 ${
@@ -68,7 +74,10 @@ export function ProductGallery({ images, alt }: { images: readonly ImageDto[]; a
                 <img
                   src={image.thumb_url}
                   alt=""
+                  width={64}
+                  height={64}
                   loading="lazy"
+                  decoding="async"
                   className="size-full object-cover"
                 />
               </button>

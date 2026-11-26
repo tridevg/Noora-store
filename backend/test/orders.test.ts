@@ -1,5 +1,5 @@
 import { SELF, env } from 'cloudflare:test';
-import { beforeAll, describe, expect, it } from 'vitest';
+import { beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { loadFixtures } from './fixtures';
 
 const URL_ORDERS = 'http://localhost/api/orders';
@@ -33,8 +33,29 @@ beforeAll(async () => {
   await loadFixtures();
 });
 
+async function stockOf(variantId: number): Promise<number> {
+  const row = await env.DB.prepare('SELECT stock FROM product_variants WHERE id = ?')
+    .bind(variantId)
+    .first<{ stock: number }>();
+  return row?.stock ?? -1;
+}
+
+async function countOrders(): Promise<number> {
+  const row = await env.DB.prepare('SELECT COUNT(*) AS n FROM orders').first<{ n: number }>();
+  return row?.n ?? 0;
+}
+
 describe('POST /api/orders', () => {
+  // Stock decrements persist across tests in this file, so restore the fixture levels first.
+  beforeEach(async () => {
+    await env.DB.prepare(
+      'UPDATE product_variants SET stock = CASE id WHEN 1 THEN 2 WHEN 2 THEN 0 WHEN 3 THEN 0 WHEN 4 THEN 5 END',
+    ).run();
+  });
+
   it('accepts five orders from one IP and blocks the sixth with 429 and Retry-After 900', async () => {
+    // Five single-unit orders need more than the fixture's 2 units. Storage is reset per test.
+    await env.DB.prepare('UPDATE product_variants SET stock = 10 WHERE id = 1').run();
     const ip = nextIp();
     for (let i = 0; i < 5; i++) {
       const res = await postOrder(orderBody(), ip);
@@ -109,6 +130,49 @@ describe('POST /api/orders', () => {
   it('returns 409 conflict when qty is above stock', async () => {
     const res = await postOrder(orderBody({}, 3), nextIp());
     expect(res.status).toBe(409);
+  });
+
+  it('returns 409 listing every short line and writes nothing when stock is short', async () => {
+    const ordersBefore = await countOrders();
+    await env.DB.prepare('UPDATE product_variants SET stock = 0 WHERE id = 2').run();
+    const short = await postOrder(
+      orderBody({
+        items: [
+          { product_id: 1, variant_id: 1, qty: 3 },
+          { product_id: 1, variant_id: 2, qty: 1 },
+        ],
+      }),
+      nextIp(),
+    );
+    expect(short.status).toBe(409);
+    const body = (await short.json()) as {
+      error: { code: string; fields?: Record<string, string> };
+    };
+    expect(body.error.code).toBe('conflict');
+    expect(body.error.fields).toEqual({
+      variant_1: 'requested 3, available 2',
+      variant_2: 'requested 1, available 0',
+    });
+    expect(await countOrders()).toBe(ordersBefore);
+    expect(await stockOf(1)).toBe(2);
+    expect(await stockOf(2)).toBe(0);
+  });
+
+  it('decrements stock in the same write as the order insert', async () => {
+    const res = await postOrder(orderBody({}, 2), nextIp());
+    expect(res.status).toBe(201);
+    expect(await stockOf(1)).toBe(0);
+    const again = await postOrder(orderBody({}, 1), nextIp());
+    expect(again.status).toBe(409);
+  });
+
+  it('lets only one of two orders for the last unit succeed', async () => {
+    await env.DB.prepare('UPDATE product_variants SET stock = 1 WHERE id = 1').run();
+    const first = await postOrder(orderBody({}, 1), nextIp());
+    expect(first.status).toBe(201);
+    const second = await postOrder(orderBody({}, 1), nextIp());
+    expect(second.status).toBe(409);
+    expect(await stockOf(1)).toBe(0);
   });
 
   it('does not count rejected requests toward the limit', async () => {

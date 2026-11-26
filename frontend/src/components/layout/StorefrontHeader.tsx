@@ -57,6 +57,17 @@ export function StorefrontHeader() {
             {t('header.searchSubmit')}
           </button>
         </form>
+        <nav aria-label={t('nav.siteLabel')} className="hidden shrink-0 items-center gap-1 md:flex">
+          <Link to="/" className="rounded-pill px-3 py-2 text-small font-medium text-ink">
+            {t('nav.home')}
+          </Link>
+          <Link to="/products" className="rounded-pill px-3 py-2 text-small font-medium text-ink">
+            {t('storefront.catalog.title')}
+          </Link>
+          <Link to="/services" className="rounded-pill px-3 py-2 text-small font-medium text-ink">
+            {t('nav.services')}
+          </Link>
+        </nav>
         <Link
           to="/cart"
           aria-label={t('header.cartLabel')}

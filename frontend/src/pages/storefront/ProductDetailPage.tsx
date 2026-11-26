@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, useParams } from 'react-router';
+import { Link, useLocation, useParams } from 'react-router';
 import type { ProductDetailDto } from '@beauty-store/shared';
 import { t } from '../../i18n';
 import { useCart } from '../../cart';
@@ -15,6 +15,9 @@ import {
   type VariantChoice,
 } from '../../components/storefront/VariantPicker';
 import { ApiError } from '../../lib/api';
+import { documentTitle } from '../../components/layout/seo';
+import { useDocumentMeta } from '../../components/layout/useDocumentMeta';
+import { maxQtyForStock } from '../../components/storefront/stockCap';
 
 /** /product/:slug: gallery with zoom, size and colour selectors that drive stock, and Add to Cart. */
 export default function ProductDetailPage() {
@@ -46,8 +49,21 @@ export default function ProductDetailPage() {
   return <ProductView key={data.product.slug} product={data.product} />;
 }
 
+/** Meta description from the product text: whitespace collapsed and cut to about 160 characters. */
+function metaDescription(product: ProductDetailDto): string {
+  const text = product.description?.replace(/\s+/g, ' ').trim() ?? '';
+  if (!text) return t('seo.productDetail.description');
+  return text.length > 160 ? `${text.slice(0, 157).trimEnd()}…` : text;
+}
+
 function ProductView({ product }: { product: ProductDetailDto }) {
   const { addLine } = useCart();
+  const { pathname } = useLocation();
+  // Per-product title and description. The layout's generic meta is the fallback while loading.
+  useDocumentMeta(
+    { title: documentTitle(product.name), description: metaDescription(product) },
+    pathname,
+  );
   const [choice, setChoice] = useState<VariantChoice | undefined>(() =>
     defaultChoice(product.variants),
   );
@@ -55,7 +71,7 @@ function ProductView({ product }: { product: ProductDetailDto }) {
   const [addedVariantId, setAddedVariantId] = useState<number | null>(null);
 
   const variant = choice ? findVariant(product.variants, choice) : undefined;
-  const canBuy = variant !== undefined && variant.stock > 0;
+  const canBuy = variant !== undefined && maxQtyForStock(variant.stock) > 0;
 
   function onAdd() {
     if (!variant || !canBuy) return;
@@ -102,6 +118,9 @@ function ProductView({ product }: { product: ProductDetailDto }) {
           >
             {t('storefront.product.addToCart')}
           </button>
+          {variant && !canBuy ? (
+            <p className="text-small font-medium text-danger">{t('storefront.card.outOfStock')}</p>
+          ) : null}
           {variant && addedVariantId === variant.id ? (
             <p role="status" className="text-small text-ink">
               {t('storefront.product.addedToCart')}{' '}
