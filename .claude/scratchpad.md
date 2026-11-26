@@ -130,3 +130,18 @@ Open: R17 (_redirects proxy for Phase 7) not approved. Lighthouse needs a Chromi
 - Measured (Lighthouse mobile, 3 runs, live): product `/product/oxidised-jhumka-earrings` Perf 93 (median), A11y 100, SEO 100, LCP median 2.84 s, CLS 0. Home `/` Perf 95, LCP median 0.89 s.
 - Rejected: inlining product JSON into the HTML from the Pages Function. Reason: product data (stock, price, variants) is edited in `/admin`. Inlined data would live in the cached HTML, so every stock or price edit would need HTML cache invalidation, and the HTML would be stale until purged. The single `GET /api/products/:slug` path keeps the public API cache (`s-maxage=300`, purged by admin mutations) as the only cache for product data.
 - Consequence: the edge preload (`frontend/functions/product/[slug].ts`) stays as is. The product LCP stays about 2.8 s; no further LCP work is planned unless the user reopens it.
+
+## 2026-11-26 — Session state / resume point
+- Where we are: Phase 8 done. Production baseline live: commit 02b280d, build index-C__s9c-a, deployment c91b5826. Product LCP target waived by user; single API data path kept (no inlined product JSON). Docs committed at f18b2d5.
+- Last commits: f18b2d5 (product LCP decision, clean baseline), 02b280d (edge preload product hero image; skin and makeup nav repointed to services), f2df097 (Phase 8 storefront reskin), 056c2aa (Phase 8 commit hash in manifest), 5945ba8 (skincare nav to /category/skin, product LCP eager image, preconnects).
+- Open items:
+  - Git push: user runs `! git push` (local dev is ahead of origin/dev).
+  - Makeup and Skincare nav both point to /services (no per-category anchors).
+  - Fallback font metrics tuned on Linux; need a real-phone check.
+  - Google Fonts is a third-party dependency (Cormorant Garamond, Plus Jakarta Sans); not self-hosted.
+  - Inter is named in `--bs-font-sans` but not loaded; body text uses the system stack.
+  - npm audit reports 6 high vulnerabilities from earlier; not addressed.
+  - Admin password rotation is the user's action.
+  - Replace sample products and placeholder settings.
+  - Admin hero tiles are placeholders.
+- Resume with: "start from last state" -> run `git status -sb`, `git log --oneline -3`, confirm origin/dev status, and check the live baseline (bundle name, `/api/settings`, product page Link header).

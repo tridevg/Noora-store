@@ -4,6 +4,7 @@ Mobile-first e-commerce and services site for a small beauty parlour and ladies'
 
 ## Status
 - Current phase: **Phase 8 deployed** (storefront reskin, Sage & Cream; final deployment https://3e75dd7b.noora-studio.pages.dev). Phase 7 signed off. Admin password rotation is the user's action.
+- Production baseline: commit 02b280d (build index-C__s9c-a, deployment c91b5826). Product LCP target waived by user; single API data path kept. Local dev branch ahead of origin/dev; push pending (user runs `! git push`).
 - Node v22.23.5 and npm 10.9.9 installed.
 - Git: remote `origin` = https://github.com/tridevg/Noora-store.git. Working branch `dev` (tracks origin/dev).
 

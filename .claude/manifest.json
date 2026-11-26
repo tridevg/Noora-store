@@ -311,5 +311,28 @@
     "scratchpad.md": "Phase 8 entry added",
     "README.md": "deploy section updated"
   },
-  "last_commit_docs": "f2df097"
+  "last_commit_docs": "f2df097",
+  "session_state": {
+    "date": "2026-11-26",
+    "where": "Phase 8 done. Production baseline live: commit 02b280d, build index-C__s9c-a, deployment c91b5826. Product LCP target waived by user; single API data path kept (no inlined product JSON). Docs committed at f18b2d5.",
+    "last_commits": [
+      "f18b2d5",
+      "02b280d",
+      "f2df097",
+      "056c2aa",
+      "5945ba8"
+    ],
+    "open_items": [
+      "Git push: user runs `! git push` (local dev is ahead of origin/dev).",
+      "Makeup and Skincare nav both point to /services (no per-category anchors).",
+      "Fallback font metrics tuned on Linux; need a real-phone check.",
+      "Google Fonts is a third-party dependency (Cormorant Garamond, Plus Jakarta Sans); not self-hosted.",
+      "Inter is named in --bs-font-sans but not loaded; body text uses the system stack.",
+      "npm audit reports 6 high vulnerabilities from earlier; not addressed.",
+      "Admin password rotation is the user's action.",
+      "Replace sample products and placeholder settings.",
+      "Admin hero tiles are placeholders."
+    ],
+    "resume_with": "'start from last state' -> run git status -sb, git log --oneline -3, confirm origin/dev status, and check the live baseline (bundle name, /api/settings, product page Link header)."
+  }
 }
